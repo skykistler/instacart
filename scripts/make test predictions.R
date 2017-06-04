@@ -14,11 +14,12 @@ uploadTestOrders <- function() {
 
 #'
 #'
-makeTestPredictions <- function(threshold = .078) {
+makeTestPredictions <- function(threshold = .2147) {
   print('Making predictions...', quote=F)
   
   test.predictions <<- h2o.predict(
-     reordered.model
+     # reordered.model
+     h2o.getModel('reordered.gbm')
     ,user_products_test.h2o
   )
   
