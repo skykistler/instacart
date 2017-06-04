@@ -14,7 +14,7 @@ uploadTestOrders <- function() {
 
 #'
 #'
-makeTestPredictions <- function(threshold = .118) {
+makeTestPredictions <- function(threshold = .078) {
   print('Making predictions...', quote=F)
   
   test.predictions <<- h2o.predict(
