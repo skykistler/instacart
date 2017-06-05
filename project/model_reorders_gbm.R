@@ -2,30 +2,30 @@ source('project/calc_meanf1score.R')
 
 #'
 #'
-# buildReorderModel <- function() {
-#   print('Building model...', quote=F)
-#   
-#   reordered.model <<- h2o.deeplearning(
-#     characteristics
-#     ,'reordered'
-#     ,training_frame = train.orders.h2o
-#     ,validation_frame = validation.orders.h2o
-#     ,model_id = 'reordered.model'
-#     ,variable_importances = T
-#     ,balance_classes = T
-#     ,score_interval = 45
-#     ,score_validation_samples=10000
-#     ,hidden = c(10, 10, 20, 20)
-#     ,activation="RectifierWithDropout"
-#     ,nfolds=3
-#   )
-#   
-#   h2o.saveModel(reordered.model, path='C:/Users/sky/Downloads/reordered.model', force = T)
+buildReorderGbm <- function() {
+  print('Building model...', quote=F)
+
+  reordered.gbm <<- h2o.gbm(
+     characteristics
+    ,'reordered'
+    ,training_frame = train.orders.h2o
+    ,validation_frame = validation.orders.h2o
+    ,model_id = 'reordered.gbm'
+    ,balance_classes = T
+    ,nfolds=2
+    ,score_tree_interval = 10
+    ,ntrees = 100
+    ,max_depth = 9
+    ,nbins = 100
+    ,stopping_rounds = 3
+  )
+
+  h2o.saveModel(reordered.gbm, path='C:/Users/sky/Downloads/reordered.gbm', force = T)
 }
 
 #'
 #'
-makeGBMPredictions <- function(threshold = .2147) {
+makeTrainPredictionsGbm <- function(threshold = .2147) {
   print('Making predictions...', quote=F)
   
   predictions <- h2o.predict(

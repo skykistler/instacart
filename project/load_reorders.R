@@ -5,8 +5,10 @@ source('bootstrap.R')
 loadReorders <- function() {
   print('Loading orders...', quote=F)
   
-  user_products_train <<- db %>% sqlQuery('SELECT * FROM reorder_training', rows_at_time = 1024)
+  user_products_train <- db %>% sqlQuery('SELECT * FROM reorder_training', rows_at_time = 1024)
   user_products_train$reordered %<>% factor
+  
+  user_products_train <<- user_products_train
   characteristics <<- colnames(user_products_train)[-(1:4)]
   
   rm(train.orders, envir = .GlobalEnv)
@@ -51,7 +53,7 @@ splitReorders <- function(ratios = 1/5) {
 uploadReorders <- function() {
   print('Uploading to h2o...', quote=F)
   
-  h2o.removeAll()
+  h2o.rm(c('train.orders', 'validation.orders', 'test.orders'))
   
   train.orders.h2o      <<- as.h2o(train.orders)
   validation.orders.h2o <<- as.h2o(validation.orders)

@@ -2,7 +2,7 @@ source('project/calc_meanf1score.R')
 
 #'
 #'
-buildReorderModel <- function() {
+buildReorderDnn <- function() {
   print('Building model...', quote=F)
   
   reordered.model <<- h2o.deeplearning(
@@ -25,7 +25,7 @@ buildReorderModel <- function() {
 
 #'
 #'
-makePredictions <- function(threshold = .078) {
+makeTrainPredictionsDnn <- function(threshold = .078) {
   print('Making predictions...', quote=F)
   
   predictions <- h2o.predict(
