@@ -14,7 +14,7 @@ uploadTestOrders <- function() {
 
 #'
 #'
-makeTestPredictions <- function(model_id = 'reordered.gbm', threshold = .2147) {
+makeTestPredictions <- function(model_id = 'reordered.gbm', threshold = .235277) {
   print('Making predictions...', quote=F)
   
   test.predictions <<- h2o.predict(
@@ -50,12 +50,12 @@ makeTestPredictions <- function(model_id = 'reordered.gbm', threshold = .2147) {
 }
 
 
-# if (!exists('user_products_test')) {
-#   loadTestOrders()
-# }
-# 
-# if (!exists('user_products_test.h2o')) {
-#   uploadTestOrders()
-# }
+if (!exists('user_products_test')) {
+  loadTestOrders()
+}
 
-# makeTestPredictions()
+if (!exists('user_products_test.h2o')) {
+  uploadTestOrders()
+}
+
+makeTestPredictions()

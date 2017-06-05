@@ -63,13 +63,13 @@ uploadReorders <- function() {
 ##########################################################################################################
 
 if (!exists('user_products_train')) {
-  loadReorders();
+  loadReorders()
 }
 
 if (!exists('train.orders')) {
-  splitReorders();
+  splitReorders()
 }
 
 if (!exists('train.orders.h2o')) {
-  uploadReorders();
+  uploadReorders()
 }

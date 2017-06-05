@@ -25,7 +25,7 @@ buildReorderGbm <- function() {
 
 #'
 #'
-makeTrainPredictionsGbm <- function(threshold = .2147) {
+makeTrainPredictionsGbm <- function(threshold = .22156) {
   print('Making predictions...', quote=F)
   
   predictions <- h2o.predict(
