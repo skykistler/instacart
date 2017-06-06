@@ -3,6 +3,8 @@
 loadTestOrders <- function() {
   print('Loading test orders...', quote=F)
   user_products_test <<- db %>% sqlQuery('SELECT * FROM reorder_testing', rows_at_time = 1024)
+  
+  rm(user_products_test.h2o, envir = .GlobalEnv)
 }
 
 #'
@@ -14,7 +16,7 @@ uploadTestOrders <- function() {
 
 #'
 #'
-makeTestPredictions <- function(model_id = 'reordered.gbm', threshold = .235277) {
+makeTestPredictions <- function(model_id = 'reordered.gbm') {
   print('Making predictions...', quote=F)
   
   test.predictions <<- h2o.predict(

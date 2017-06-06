@@ -12,29 +12,40 @@ buildReorderGbm <- function() {
     ,validation_frame = validation.orders.h2o
     ,model_id = 'reordered.gbm'
     ,balance_classes = T
-    ,nfolds=2
-    ,score_tree_interval = 10
-    ,ntrees = 100
-    ,max_depth = 9
-    ,nbins = 100
-    ,stopping_rounds = 3
+    ,nfolds=6
+    ,ntrees = 500
+    ,max_depth = 24
+    ,min_rows = 3
+    ,nbins = 20
+    ,learn_rate = .08
+    ,learn_rate_annealing = .99
+    ,score_tree_interval = 15
+    ,stopping_rounds = 5
+    ,sample_rate = .8
+    ,col_sample_rate = .8
   )
 
-  h2o.saveModel(reordered.gbm, path='C:/Users/sky/Downloads/reordered.gbm', force = T)
+  h2o.saveModel(h2o.getModel('reordered.gbm'), path='C:/Users/sky/Downloads/reordered.deep.gbm', force = T)
 }
 
 #'
 #'
-makeTrainPredictionsGbm <- function(threshold = .22156) {
+makeTrainPredictionsGbm <- function() {
   print('Making predictions...', quote=F)
   
+  model <- h2o.getModel('reordered.gbm')
+  
+  performance <- h2o.performance(model, validation.orders.h2o)
+  threshold   <- performance@metrics$max_criteria_and_metric_scores[1, 'threshold']
+  
   predictions <- h2o.predict(
-     h2o.getModel('reordered.gbm')
+     model
     ,test.orders.h2o
   )
   
   test.orders$prediction <- ifelse(predictions$p1 >= threshold, 1, 0) %>% as.vector('numeric') %>% factor
   
+  threshold   <<- threshold
   predictions <<- predictions
   test.orders <<- test.orders
   

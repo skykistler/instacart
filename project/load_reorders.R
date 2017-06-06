@@ -17,7 +17,7 @@ loadReorders <- function() {
 
 #'
 #'
-splitReorders <- function(ratios = 1/5) {
+splitReorders <- function(ratios = 1/4) {
   print('Splitting orders...', quote=F)
   
   # Split with order ID's to keep orders together
@@ -62,14 +62,15 @@ uploadReorders <- function() {
 
 ##########################################################################################################
 
-if (!exists('user_products_train')) {
-  loadReorders()
-}
-
-if (!exists('train.orders')) {
-  splitReorders()
-}
-
-if (!exists('train.orders.h2o')) {
-  uploadReorders()
-}
+# if (!exists('user_products_train')) {
+#   loadReorders()
+# }
+# 
+# if (!exists('train.orders')) {
+#   splitReorders()
+# }
+# 
+# if (!exists('train.orders.h2o')) {
+#   uploadReorders()
+#   rm(user_products_train)
+# }
