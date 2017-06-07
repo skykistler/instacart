@@ -2,3 +2,8 @@ data/*
 .Rproj.user
 .RData
 .Rhistory
+bin
+.settings
+.classpath
+.project
+**.DS_Store

@@ -14,7 +14,7 @@ buildReorderGbm <- function() {
     ,balance_classes = T
     ,nfolds=6
     ,ntrees = 500
-    ,max_depth = 24
+    ,max_depth = 20
     ,min_rows = 3
     ,nbins = 20
     ,learn_rate = .08
