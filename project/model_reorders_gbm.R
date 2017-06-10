@@ -1,5 +1,3 @@
-source('project/calc_meanf1score.R')
-
 #'
 #'
 buildReorderGbm <- function() {
@@ -13,14 +11,14 @@ buildReorderGbm <- function() {
     ,model_id = 'reordered.gbm'
     ,balance_classes = T
     ,nfolds=6
-    ,ntrees = 500
-    ,max_depth = 20
+    ,ntrees = 200
+    ,max_depth = 12
     ,min_rows = 3
     ,nbins = 20
-    ,learn_rate = .08
+    ,learn_rate = .12
     ,learn_rate_annealing = .99
     ,score_tree_interval = 15
-    ,stopping_rounds = 5
+    ,stopping_rounds = 3
     ,sample_rate = .8
     ,col_sample_rate = .8
   )

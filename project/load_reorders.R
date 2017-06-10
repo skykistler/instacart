@@ -1,5 +1,3 @@
-source('bootstrap.R')
-
 #'
 #'
 loadReorders <- function() {
@@ -17,12 +15,21 @@ loadReorders <- function() {
 
 #'
 #'
-splitReorders <- function(ratios = 1/4) {
+splitReorders <- function(sample.size = .4, train.split = .1) {
   print('Splitting orders...', quote=F)
   
   # Split with order ID's to keep orders together
   orders <<- user_products_train$order_id %>% factor %>% levels
-  order.train.sample <<- sample.split(orders, ratios)
+  order.model.sample <<- sample.split(orders, sample.size)
+  
+  # Sample entire set to reduce data
+  orders <<- 
+    user_products_train %>% 
+    filter(order_id %in% orders[order.model.sample])
+  
+  ### Split train/validation/test data
+  
+  order.train.sample <<- sample.split(orders, train.split)
   
   # Order-grouped training data
   train.orders <<- 
@@ -37,7 +44,7 @@ splitReorders <- function(ratios = 1/4) {
     factor %>% levels
   
   # Split non-training orders
-  order.validation.sample <<- sample.split(non.train.orders, 1 / ((1/ratios) - 1))
+  order.validation.sample <<- sample.split(non.train.orders, train.split)
   
   # Smaller set goes to model validation
   validation.orders <<- user_products_train %>% filter(order_id %in% non.train.orders[ order.validation.sample])
@@ -45,7 +52,7 @@ splitReorders <- function(ratios = 1/4) {
   # Leave the rest to testing
   test.orders       <<- user_products_train %>% filter(order_id %in% non.train.orders[!order.validation.sample])
   
-  rm(train.orders.h2o, envir = .GlobalEnv)
+  uploadReorders()
 }
 
 #'
@@ -61,16 +68,3 @@ uploadReorders <- function() {
 }
 
 ##########################################################################################################
-
-# if (!exists('user_products_train')) {
-#   loadReorders()
-# }
-# 
-# if (!exists('train.orders')) {
-#   splitReorders()
-# }
-# 
-# if (!exists('train.orders.h2o')) {
-#   uploadReorders()
-#   rm(user_products_train)
-# }

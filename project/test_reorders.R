@@ -17,6 +17,14 @@ uploadTestOrders <- function() {
 #'
 #'
 makeTestPredictions <- function(model_id = 'reordered.gbm') {
+  if (!exists('user_products_test')) {
+    loadTestOrders()
+  }
+  
+  if (!exists('user_products_test.h2o')) {
+    uploadTestOrders()
+  }
+  
   print('Making predictions...', quote=F)
   
   test.predictions <<- h2o.predict(
@@ -50,14 +58,3 @@ makeTestPredictions <- function(model_id = 'reordered.gbm') {
       row.names=F
     )
 }
-
-
-if (!exists('user_products_test')) {
-  loadTestOrders()
-}
-
-if (!exists('user_products_test.h2o')) {
-  uploadTestOrders()
-}
-
-makeTestPredictions()
