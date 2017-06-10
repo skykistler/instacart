@@ -1,7 +1,7 @@
 /*
  * Java CSV is a stream based library for reading and writing
  * CSV and other delimited data.
- *   
+ * 
  * Copyright (C) Bruce Dunwiddie bruce@csvreader.com
  *
  * This library is free software; you can redistribute it and/or
@@ -11,20 +11,20 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 package com.csvreader;
 
+import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.BufferedWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
@@ -33,7 +33,7 @@ import java.nio.charset.Charset;
  */
 public class CsvWriter {
 	private Writer outputStream = null;
-	
+
 	private String fileName = null;
 
 	private boolean firstColumn = true;
@@ -48,7 +48,7 @@ public class CsvWriter {
 	private boolean initialized = false;
 
 	private boolean closed = false;
-	
+
 	private String systemRecordDelimiter = System.getProperty("line.separator");
 
 	/**
@@ -286,14 +286,16 @@ public class CsvWriter {
 						|| content.indexOf(userSettings.Delimiter) > -1
 						|| (!useCustomRecordDelimiter && (content
 								.indexOf(Letters.LF) > -1 || content
-								.indexOf(Letters.CR) > -1))
+										.indexOf(Letters.CR) > -1))
 						|| (useCustomRecordDelimiter && content
 								.indexOf(userSettings.RecordDelimiter) > -1)
 						|| (firstColumn && content.length() > 0 && content
-								.charAt(0) == userSettings.Comment) ||
-				// check for empty first column, which if on its own line must
-				// be qualified or the line will be skipped
-				(firstColumn && content.length() == 0))) {
+								.charAt(0) == userSettings.Comment)
+						||
+						// check for empty first column, which if on its own
+						// line must
+						// be qualified or the line will be skipped
+						(firstColumn && content.length() == 0))) {
 			textQualify = true;
 		}
 
@@ -391,7 +393,7 @@ public class CsvWriter {
 		} else {
 			outputStream.write(systemRecordDelimiter);
 		}
-		
+
 		firstColumn = true;
 	}
 
@@ -472,9 +474,10 @@ public class CsvWriter {
 	/**
 	 * Clears all buffers for the current writer and causes any buffered data to
 	 * be written to the underlying device.
+	 * 
 	 * @exception IOException
 	 *                Thrown if an error occurs while writing data to the
-	 *                destination stream. 
+	 *                destination stream.
 	 */
 	public void flush() throws IOException {
 		outputStream.flush();
@@ -520,13 +523,14 @@ public class CsvWriter {
 	private void checkClosed() throws IOException {
 		if (closed) {
 			throw new IOException(
-			"This instance of the CsvWriter class has already been closed.");
+					"This instance of the CsvWriter class has already been closed.");
 		}
 	}
 
 	/**
 	 * 
 	 */
+	@Override
 	protected void finalize() {
 		close(false);
 	}

@@ -1,7 +1,7 @@
 /*
  * Java CSV is a stream based library for reading and writing
  * CSV and other delimited data.
- *   
+ * 
  * Copyright (C) Bruce Dunwiddie bruce@csvreader.com
  *
  * This library is free software; you can redistribute it and/or
@@ -11,12 +11,12 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 package com.csvreader;
 
@@ -662,42 +662,42 @@ public class CsvReader {
 									escapeLength++;
 
 									switch (escape) {
-									case ComplexEscape.UNICODE:
-										escapeValue *= (char) 16;
-										escapeValue += hexToDec(currentLetter);
+										case ComplexEscape.UNICODE:
+											escapeValue *= (char) 16;
+											escapeValue += hexToDec(currentLetter);
 
-										if (escapeLength == 4) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 4) {
+												readingComplexEscape = false;
+											}
 
-										break;
-									case ComplexEscape.OCTAL:
-										escapeValue *= (char) 8;
-										escapeValue += (char) (currentLetter - '0');
+											break;
+										case ComplexEscape.OCTAL:
+											escapeValue *= (char) 8;
+											escapeValue += (char) (currentLetter - '0');
 
-										if (escapeLength == 3) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 3) {
+												readingComplexEscape = false;
+											}
 
-										break;
-									case ComplexEscape.DECIMAL:
-										escapeValue *= (char) 10;
-										escapeValue += (char) (currentLetter - '0');
+											break;
+										case ComplexEscape.DECIMAL:
+											escapeValue *= (char) 10;
+											escapeValue += (char) (currentLetter - '0');
 
-										if (escapeLength == 3) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 3) {
+												readingComplexEscape = false;
+											}
 
-										break;
-									case ComplexEscape.HEX:
-										escapeValue *= (char) 16;
-										escapeValue += hexToDec(currentLetter);
+											break;
+										case ComplexEscape.HEX:
+											escapeValue *= (char) 16;
+											escapeValue += hexToDec(currentLetter);
 
-										if (escapeLength == 2) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 2) {
+												readingComplexEscape = false;
+											}
 
-										break;
+											break;
 									}
 
 									if (!readingComplexEscape) {
@@ -721,79 +721,79 @@ public class CsvReader {
 								} else if (userSettings.EscapeMode == ESCAPE_MODE_BACKSLASH
 										&& lastLetterWasEscape) {
 									switch (currentLetter) {
-									case 'n':
-										appendLetter(Letters.LF);
-										break;
-									case 'r':
-										appendLetter(Letters.CR);
-										break;
-									case 't':
-										appendLetter(Letters.TAB);
-										break;
-									case 'b':
-										appendLetter(Letters.BACKSPACE);
-										break;
-									case 'f':
-										appendLetter(Letters.FORM_FEED);
-										break;
-									case 'e':
-										appendLetter(Letters.ESCAPE);
-										break;
-									case 'v':
-										appendLetter(Letters.VERTICAL_TAB);
-										break;
-									case 'a':
-										appendLetter(Letters.ALERT);
-										break;
-									case '0':
-									case '1':
-									case '2':
-									case '3':
-									case '4':
-									case '5':
-									case '6':
-									case '7':
-										escape = ComplexEscape.OCTAL;
-										readingComplexEscape = true;
-										escapeLength = 1;
-										escapeValue = (char) (currentLetter - '0');
-										dataBuffer.ColumnStart = dataBuffer.Position + 1;
-										break;
-									case 'u':
-									case 'x':
-									case 'o':
-									case 'd':
-									case 'U':
-									case 'X':
-									case 'O':
-									case 'D':
-										switch (currentLetter) {
-										case 'u':
-										case 'U':
-											escape = ComplexEscape.UNICODE;
+										case 'n':
+											appendLetter(Letters.LF);
 											break;
-										case 'x':
-										case 'X':
-											escape = ComplexEscape.HEX;
+										case 'r':
+											appendLetter(Letters.CR);
 											break;
-										case 'o':
-										case 'O':
+										case 't':
+											appendLetter(Letters.TAB);
+											break;
+										case 'b':
+											appendLetter(Letters.BACKSPACE);
+											break;
+										case 'f':
+											appendLetter(Letters.FORM_FEED);
+											break;
+										case 'e':
+											appendLetter(Letters.ESCAPE);
+											break;
+										case 'v':
+											appendLetter(Letters.VERTICAL_TAB);
+											break;
+										case 'a':
+											appendLetter(Letters.ALERT);
+											break;
+										case '0':
+										case '1':
+										case '2':
+										case '3':
+										case '4':
+										case '5':
+										case '6':
+										case '7':
 											escape = ComplexEscape.OCTAL;
+											readingComplexEscape = true;
+											escapeLength = 1;
+											escapeValue = (char) (currentLetter - '0');
+											dataBuffer.ColumnStart = dataBuffer.Position + 1;
 											break;
+										case 'u':
+										case 'x':
+										case 'o':
 										case 'd':
+										case 'U':
+										case 'X':
+										case 'O':
 										case 'D':
-											escape = ComplexEscape.DECIMAL;
+											switch (currentLetter) {
+												case 'u':
+												case 'U':
+													escape = ComplexEscape.UNICODE;
+													break;
+												case 'x':
+												case 'X':
+													escape = ComplexEscape.HEX;
+													break;
+												case 'o':
+												case 'O':
+													escape = ComplexEscape.OCTAL;
+													break;
+												case 'd':
+												case 'D':
+													escape = ComplexEscape.DECIMAL;
+													break;
+											}
+
+											readingComplexEscape = true;
+											escapeLength = 0;
+											escapeValue = (char) 0;
+											dataBuffer.ColumnStart = dataBuffer.Position + 1;
+
 											break;
-										}
-
-										readingComplexEscape = true;
-										escapeLength = 0;
-										escapeValue = (char) 0;
-										dataBuffer.ColumnStart = dataBuffer.Position + 1;
-
-										break;
-									default:
-										break;
+										default:
+											break;
 									}
 
 									lastLetterWasEscape = false;
@@ -943,42 +943,42 @@ public class CsvReader {
 									escapeLength++;
 
 									switch (escape) {
-									case ComplexEscape.UNICODE:
-										escapeValue *= (char) 16;
-										escapeValue += hexToDec(currentLetter);
+										case ComplexEscape.UNICODE:
+											escapeValue *= (char) 16;
+											escapeValue += hexToDec(currentLetter);
 
-										if (escapeLength == 4) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 4) {
+												readingComplexEscape = false;
+											}
 
-										break;
-									case ComplexEscape.OCTAL:
-										escapeValue *= (char) 8;
-										escapeValue += (char) (currentLetter - '0');
+											break;
+										case ComplexEscape.OCTAL:
+											escapeValue *= (char) 8;
+											escapeValue += (char) (currentLetter - '0');
 
-										if (escapeLength == 3) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 3) {
+												readingComplexEscape = false;
+											}
 
-										break;
-									case ComplexEscape.DECIMAL:
-										escapeValue *= (char) 10;
-										escapeValue += (char) (currentLetter - '0');
+											break;
+										case ComplexEscape.DECIMAL:
+											escapeValue *= (char) 10;
+											escapeValue += (char) (currentLetter - '0');
 
-										if (escapeLength == 3) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 3) {
+												readingComplexEscape = false;
+											}
 
-										break;
-									case ComplexEscape.HEX:
-										escapeValue *= (char) 16;
-										escapeValue += hexToDec(currentLetter);
+											break;
+										case ComplexEscape.HEX:
+											escapeValue *= (char) 16;
+											escapeValue += hexToDec(currentLetter);
 
-										if (escapeLength == 2) {
-											readingComplexEscape = false;
-										}
+											if (escapeLength == 2) {
+												readingComplexEscape = false;
+											}
 
-										break;
+											break;
 									}
 
 									if (!readingComplexEscape) {
@@ -989,79 +989,79 @@ public class CsvReader {
 								} else if (userSettings.EscapeMode == ESCAPE_MODE_BACKSLASH
 										&& lastLetterWasBackslash) {
 									switch (currentLetter) {
-									case 'n':
-										appendLetter(Letters.LF);
-										break;
-									case 'r':
-										appendLetter(Letters.CR);
-										break;
-									case 't':
-										appendLetter(Letters.TAB);
-										break;
-									case 'b':
-										appendLetter(Letters.BACKSPACE);
-										break;
-									case 'f':
-										appendLetter(Letters.FORM_FEED);
-										break;
-									case 'e':
-										appendLetter(Letters.ESCAPE);
-										break;
-									case 'v':
-										appendLetter(Letters.VERTICAL_TAB);
-										break;
-									case 'a':
-										appendLetter(Letters.ALERT);
-										break;
-									case '0':
-									case '1':
-									case '2':
-									case '3':
-									case '4':
-									case '5':
-									case '6':
-									case '7':
-										escape = ComplexEscape.OCTAL;
-										readingComplexEscape = true;
-										escapeLength = 1;
-										escapeValue = (char) (currentLetter - '0');
-										dataBuffer.ColumnStart = dataBuffer.Position + 1;
-										break;
-									case 'u':
-									case 'x':
-									case 'o':
-									case 'd':
-									case 'U':
-									case 'X':
-									case 'O':
-									case 'D':
-										switch (currentLetter) {
-										case 'u':
-										case 'U':
-											escape = ComplexEscape.UNICODE;
+										case 'n':
+											appendLetter(Letters.LF);
 											break;
-										case 'x':
-										case 'X':
-											escape = ComplexEscape.HEX;
+										case 'r':
+											appendLetter(Letters.CR);
 											break;
-										case 'o':
-										case 'O':
+										case 't':
+											appendLetter(Letters.TAB);
+											break;
+										case 'b':
+											appendLetter(Letters.BACKSPACE);
+											break;
+										case 'f':
+											appendLetter(Letters.FORM_FEED);
+											break;
+										case 'e':
+											appendLetter(Letters.ESCAPE);
+											break;
+										case 'v':
+											appendLetter(Letters.VERTICAL_TAB);
+											break;
+										case 'a':
+											appendLetter(Letters.ALERT);
+											break;
+										case '0':
+										case '1':
+										case '2':
+										case '3':
+										case '4':
+										case '5':
+										case '6':
+										case '7':
 											escape = ComplexEscape.OCTAL;
+											readingComplexEscape = true;
+											escapeLength = 1;
+											escapeValue = (char) (currentLetter - '0');
+											dataBuffer.ColumnStart = dataBuffer.Position + 1;
 											break;
+										case 'u':
+										case 'x':
+										case 'o':
 										case 'd':
+										case 'U':
+										case 'X':
+										case 'O':
 										case 'D':
-											escape = ComplexEscape.DECIMAL;
+											switch (currentLetter) {
+												case 'u':
+												case 'U':
+													escape = ComplexEscape.UNICODE;
+													break;
+												case 'x':
+												case 'X':
+													escape = ComplexEscape.HEX;
+													break;
+												case 'o':
+												case 'O':
+													escape = ComplexEscape.OCTAL;
+													break;
+												case 'd':
+												case 'D':
+													escape = ComplexEscape.DECIMAL;
+													break;
+											}
+
+											readingComplexEscape = true;
+											escapeLength = 0;
+											escapeValue = (char) 0;
+											dataBuffer.ColumnStart = dataBuffer.Position + 1;
+
 											break;
-										}
-
-										readingComplexEscape = true;
-										escapeLength = 0;
-										escapeValue = (char) 0;
-										dataBuffer.ColumnStart = dataBuffer.Position + 1;
-
-										break;
-									default:
-										break;
+										default:
+											break;
 									}
 
 									lastLetterWasBackslash = false;
@@ -1593,6 +1593,7 @@ public class CsvReader {
 	/**
 	 * 
 	 */
+	@Override
 	protected void finalize() {
 		close(false);
 	}
