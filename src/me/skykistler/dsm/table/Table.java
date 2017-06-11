@@ -1,4 +1,4 @@
-package me.skykistler.dsm;
+package me.skykistler.dsm.table;
 
 public interface Table {
 
@@ -14,6 +14,8 @@ public interface Table {
 		for (String h : getColumns()) {
 			System.out.print(h + "   :   ");
 		}
+
+		System.out.println();
 
 		for (int i = 0; i < rows; i++) {
 			if (size() < i)

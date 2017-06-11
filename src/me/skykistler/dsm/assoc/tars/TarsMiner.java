@@ -45,7 +45,7 @@ public class TarsMiner {
 		That = new ArrayList<Tars>();
 		Yam = L.clone();
 		
-		baskets.sortDescending()
+		baskets.sortDescending();
 		
 		for (int j = 0; j < baskets.size(); j++) {
 			int i = j - 1;
