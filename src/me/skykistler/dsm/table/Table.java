@@ -6,7 +6,7 @@ public interface Table {
 
 	public int size();
 
-	public String[] getColumnNames();
+	public ArrayList<String> getColumnNames();
 
 	public Column getColumn(String column);
 

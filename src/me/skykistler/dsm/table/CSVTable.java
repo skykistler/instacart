@@ -14,7 +14,7 @@ public class CSVTable implements Table {
 
 	private File file;
 
-	private String[] columnNames = new String[0];
+	private ArrayList<String> columnNames = new ArrayList<String>();
 	private HashMap<String, Column> data = new HashMap<String, Column>();
 
 	public CSVTable(String name) {
@@ -33,12 +33,12 @@ public class CSVTable implements Table {
 			CsvReader csv = new CsvReader(file.getAbsolutePath());
 
 			csv.readHeaders();
-			columnNames = csv.getHeaders();
 
 			HashMap<String, ArrayList<Object>> head = new HashMap<String, ArrayList<Object>>();
+			String[] headerColumns = csv.getHeaders();
 
 			// Build temporary head structure
-			for (String h : columnNames) {
+			for (String h : headerColumns) {
 				head.put(h, new ArrayList<Object>());
 			}
 
@@ -84,10 +84,10 @@ public class CSVTable implements Table {
 			int h;
 
 			// Print column names
-			for (h = 0; h < columnNames.length; h++) {
-				line.append(columnNames[h]);
+			for (h = 0; h < columnNames.size(); h++) {
+				line.append(columnNames.get(h));
 
-				if (h != columnNames.length - 1)
+				if (h != columnNames.size() - 1)
 					line.append(",");
 			}
 
@@ -99,10 +99,10 @@ public class CSVTable implements Table {
 			for (int i = 0; i < size(); i++) {
 
 				// Append each column value
-				for (h = 0; h < columnNames.length; h++) {
-					line.append(get(columnNames[h], i));
+				for (h = 0; h < columnNames.size(); h++) {
+					line.append(get(columnNames.get(h), i));
 
-					if (h != columnNames.length - 1)
+					if (h != columnNames.size() - 1)
 						line.append(",");
 				}
 
@@ -119,11 +119,11 @@ public class CSVTable implements Table {
 
 	@Override
 	public int size() {
-		return getColumn(columnNames[0]).size();
+		return getColumn(columnNames.get(0)).size();
 	}
 
 	@Override
-	public String[] getColumnNames() {
+	public ArrayList<String> getColumnNames() {
 		return columnNames;
 	}
 
@@ -140,13 +140,13 @@ public class CSVTable implements Table {
 	@Override
 	public void addColumn(Column column) {
 		data.put(column.getTitle(), column);
-		columnNames = data.keySet().toArray(new String[0]);
+		columnNames.add(column.getTitle());
 	}
 
 	@Override
 	public void addRecord(ArrayList<Object> values) {
-		for (int i = 0; i < columnNames.length; i++) {
-			getColumn(columnNames[i]).addRaw(values.get(i));
+		for (int i = 0; i < columnNames.size(); i++) {
+			getColumn(columnNames.get(i)).addRaw(values.get(i));
 		}
 	}
 

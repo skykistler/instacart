@@ -1,13 +1,12 @@
 package me.skykistler.dsm.assoc.tars;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import gnu.trove.list.array.TDoubleArrayList;
 
 public class TarsMiner implements Median {
 
-	private Collection<SequenceTree> sequences;
+	private ArrayList<SequenceTree> sequences;
 
 	public TarsMiner(BaseSequenceExtractor sequenceExtractor) {
 		sequences = sequenceExtractor.getSequences();

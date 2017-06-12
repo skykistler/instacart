@@ -8,8 +8,6 @@ import gnu.trove.list.TIntList;
 
 public class FPTree {
 
-	protected static final int MIN_SUPPORT = 1000;
-
 	// Unused right now, may be used for FP-Growth
 	// private static FPTreeDictionary treeDict = new FPTreeDictionary();
 	// private FPTree parent;
@@ -62,7 +60,7 @@ public class FPTree {
 			nextPath.r_insertTree(transactionItems.subList(1, transactionItems.size()));
 	}
 
-	public ArrayList<ItemSet> r_growItemSets(ItemSet parentPrefix) {
+	public ArrayList<ItemSet> r_growItemSets(ItemSet parentPrefix, int min_support) {
 		// Prepare resulting sets
 		ArrayList<ItemSet> frequentItemSets = new ArrayList<ItemSet>();
 
@@ -82,10 +80,10 @@ public class FPTree {
 		}
 
 		for (FPTree child : getChildren()) {
-			if (child.getSupport() < MIN_SUPPORT)
+			if (child.getSupport() < min_support)
 				continue;
 
-			frequentItemSets.addAll(child.r_growItemSets(thisPrefix));
+			frequentItemSets.addAll(child.r_growItemSets(thisPrefix, min_support));
 		}
 
 		return frequentItemSets;

@@ -1,6 +1,7 @@
 package me.skykistler;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import gnu.trove.list.array.TIntArrayList;
 import me.skykistler.dsm.assoc.fptree.ItemSet;
@@ -9,30 +10,31 @@ import me.skykistler.dsm.assoc.tars.SequenceTree;
 import me.skykistler.dsm.assoc.tars.TarsMiner;
 import me.skykistler.dsm.assoc.tars.UserTransaction;
 import me.skykistler.dsm.table.CSVTable;
+import me.skykistler.dsm.table.DecimalColumn;
 import me.skykistler.dsm.table.IntColumn;
 import me.skykistler.dsm.table.StringColumn;
 
 public class Phase2 extends Phase1 {
 
-	public static final int MIN_SUPPORT_BASE_SEQUENCE = 3;
+	public static final int MIN_SUPPORT_BASE_SEQUENCE = 50;
+	public static final String BASE_SEQUENCES_FILE = "base sequences.csv";
 
 	public CSVTable frequentItemSetsTable;
 	public ArrayList<ItemSet> frequentItemSets;
+	public ArrayList<SequenceTree> baseSequences;
 
 	public BaseSequenceExtractor sequenceExtractor;
 	public TarsMiner tarsMiner;
 
 	@Override
 	public void go() {
-		try {
-			Thread.sleep(5 * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// wait(15);
 
 		loadBasketsTable();
 		transformBaskets();
 		freeBasketsTable();
+
+		// wait(5);
 
 		loadFrequentItemSets();
 
@@ -40,18 +42,8 @@ public class Phase2 extends Phase1 {
 
 		estimateParameters();
 
-		for (SequenceTree s : sequenceExtractor.getSequences()) {
-			System.out.println("X: " + s.getX());
-			System.out.println("Y: " + s.getY());
-			System.out.println("Support: " + s.getSupport());
-			System.out.println("Max Intertime: " + s.getMaxInterTime());
-
-			for (int i : s.getIntertimes().toArray())
-				System.out.print(i + " ");
-
-			System.out.println();
-			System.out.println();
-		}
+		sortBaseSequences();
+		saveBaseSequences();
 
 		printMemUsage();
 	}
@@ -93,22 +85,96 @@ public class Phase2 extends Phase1 {
 
 		sequenceExtractor = new BaseSequenceExtractor(frequentItemSets);
 
-		int i, lastSize = 0;
-		// for (ArrayList<UserTransaction> userBaskets : basketLists.values())
-		ArrayList<UserTransaction> userBaskets = basketLists.get(1);
-		for (i = 0; i < userBaskets.size() - 1; i++) {
-			sequenceExtractor.processUserTransactions(userBaskets.get(i), userBaskets.subList(i + 1, userBaskets.size()));
+		int i, lastSize = 0, users = 0;
+		for (ArrayList<UserTransaction> userBaskets : basketLists.values()) {
 
-			if (sequenceExtractor.size() - lastSize > 100000) {
-				lastSize = sequenceExtractor.size();
-				System.out.println("Extracted " + sequenceExtractor.size() + " base sequences...");
+			for (i = 0; i < userBaskets.size() - 1; i++)
+				sequenceExtractor.processUserTransactions(userBaskets.get(i), userBaskets.subList(i + 1, userBaskets.size()));
+
+			users++;
+			SequenceTree.userTimes.clear();
+
+			if (users - lastSize == 10000) {
+				lastSize = users;
+				System.out.println("Extracted " + sequenceExtractor.size() + " base sequences from " + users + " users...");
+
+				printMemUsage();
 			}
 		}
+
 		sequenceExtractor.pruneMinSupport(MIN_SUPPORT_BASE_SEQUENCE);
+		baseSequences = sequenceExtractor.getSequences();
 
 		long diff = System.nanoTime() - before;
 		diff /= 1000000000;
 		System.out.println("Extracted " + sequenceExtractor.size() + " base sequences in " + diff + " seconds");
+	}
+
+	public void sortBaseSequences() {
+		System.out.println("Sorting base sequences by frequency...");
+
+		baseSequences.sort(new Comparator<SequenceTree>() {
+
+			@Override
+			public int compare(SequenceTree o1, SequenceTree o2) {
+				if (o1.getSupport() == o2.getSupport())
+					return 0;
+
+				// Sort in descending order
+				return o1.getSupport() > o2.getSupport() ? -1 : 1;
+			}
+
+		});
+	}
+
+	public void saveBaseSequences() {
+		System.out.println("Saving base sequences...");
+
+		// Make new table
+		CSVTable baseSequencesTable = new CSVTable(BASE_SEQUENCES_FILE, true);
+		baseSequencesTable.addColumn(new IntColumn(baseSequencesTable, "support"));
+		baseSequencesTable.addColumn(new DecimalColumn(baseSequencesTable, "max_intertime"));
+		baseSequencesTable.addColumn(new StringColumn(baseSequencesTable, "X"));
+		baseSequencesTable.addColumn(new StringColumn(baseSequencesTable, "Y"));
+
+		// Temporary record buffers
+		ArrayList<Object> record = new ArrayList<Object>();
+		StringBuilder items = new StringBuilder();
+
+		for (SequenceTree sequence : baseSequences) {
+			// Support value
+			record.add(sequence.getSupport());
+			record.add(sequence.getMaxInterTime());
+
+			// Construct space-separated item list for X
+			for (int item : sequence.getX().toArray()) {
+				if (items.length() > 0)
+					items.append(" ");
+				items.append(item);
+			}
+
+			// Add items to record
+			record.add(items.toString());
+			items.setLength(0);
+
+			// Construct space-separated item list
+			for (int item : sequence.getY().toArray()) {
+				if (items.length() > 0)
+					items.append(" ");
+				items.append(item);
+			}
+
+			// Item list value
+			record.add(items.toString());
+
+			baseSequencesTable.addRecord(record);
+
+			// Reset for next record
+			record.clear();
+			items.setLength(0);
+		}
+
+		baseSequencesTable.save();
 	}
 
 	public void estimateParameters() {

@@ -2,50 +2,53 @@ package me.skykistler.dsm.assoc.tars;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import me.skykistler.dsm.assoc.fptree.ItemSet;
 
 public class SequenceTree implements Median {
-	private static TIntObjectHashMap<TIntIntHashMap> userTimes = new TIntObjectHashMap<TIntIntHashMap>();
+	public static TIntIntHashMap userTimes = new TIntIntHashMap();
 
-	private ItemSet X;
-	private ItemSet Y;
+	private ItemSet X; // head
+	private ItemSet Y; // tail
 	private int hash_id = -1;
+	private int support;
 
-	private TIntArrayList interTimes = new TIntArrayList(2);
-	private TIntArrayList intraTimes = new TIntArrayList(2);
+	private TIntArrayList interTimes = new TIntArrayList(2); // distances
+																// between
+																// occurences
+	private TIntArrayList intraTimes = new TIntArrayList(2); // distances
+																// between head
+																// and tail
 
 	private double medianInterTime = -1, maxInterTime;
 
 	public SequenceTree(ItemSet X, ItemSet Y) {
 		this.X = X;
 		this.Y = Y;
-		hash_id = (X.hashCode() << 16) + Y.hashCode();
+		hash_id = getHashCode();
 	}
 
 	public void addIntraTime(int d) {
 		intraTimes.add(d);
+		support++;
 	}
 
 	public void addInterTime(UserTransaction t) {
-		if (userTimes.containsKey(t.getUserId()) && userTimes.get(t.getUserId()).containsKey(hash_id)) {
-			interTimes.add(t.getDaysSinceFirstOrder() - userTimes.get(t.getUserId()).get(hash_id));
-		}
+		if (userTimes.containsKey(hash_id))
+			interTimes.add(t.getDaysSinceFirstOrder() - userTimes.get(hash_id));
 
-		if (!userTimes.containsKey(t.getUserId())) {
-			userTimes.put(t.getUserId(), new TIntIntHashMap());
-		}
-
-		userTimes.get(t.getUserId()).put(hash_id, t.getDaysSinceFirstOrder());
+		userTimes.put(hash_id, t.getDaysSinceFirstOrder());
 	}
 
 	public int getSupport() {
-		return intraTimes.size();
+		return support;
 	}
 
 	public double getMedianInterTime() {
-		if (medianInterTime < 0)
+		if (medianInterTime < 0) {
 			medianInterTime = median(interTimes);
+
+			interTimes = null;
+		}
 
 		return medianInterTime;
 	}
@@ -73,5 +76,9 @@ public class SequenceTree implements Median {
 	@Override
 	public int hashCode() {
 		return hash_id;
+	}
+
+	private int getHashCode() {
+		return (X.hashCode() << 16) + Y.hashCode();
 	}
 }

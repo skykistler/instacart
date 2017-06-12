@@ -1,48 +1,66 @@
 package me.skykistler.dsm.assoc.tars;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import me.skykistler.dsm.assoc.fptree.ItemSet;
 
 public class BaseSequenceExtractor {
 
-	private ArrayList<ItemSet> frequentItemSets;
-	private HashMap<Integer, SequenceTree> baseSequences = new HashMap<Integer, SequenceTree>();
+	private ArrayList<ItemSet> frequentItemSetList;
+	private TIntObjectHashMap<ItemSet> frequentItemSets = new TIntObjectHashMap<ItemSet>();
+	private TIntObjectHashMap<SequenceTree> baseSequences;
+	private ArrayList<SequenceTree> baseSequenceList;
 
-	public BaseSequenceExtractor(ArrayList<ItemSet> frequentItemSets) {
-		this.frequentItemSets = frequentItemSets;
+	private TIntArrayList toRemove = new TIntArrayList();
+	private TIntArrayList encountered = new TIntArrayList();
+
+	public BaseSequenceExtractor(ArrayList<ItemSet> frequentItemSetList) {
+		this.frequentItemSetList = frequentItemSetList;
+
+		for (ItemSet set : frequentItemSetList)
+			frequentItemSets.put(set.hashCode(), set);
+
+		baseSequences = new TIntObjectHashMap<SequenceTree>(frequentItemSetList.size() * frequentItemSetList.size());
+		baseSequenceList = new ArrayList<SequenceTree>();
 	}
 
-	public void processUserTransactions(UserTransaction X, List<UserTransaction> list) {
-		ArrayList<ItemSet> freqSetsInX = getFrequentItemSetsIn(X);
+	public void processUserTransactions(UserTransaction X, List<UserTransaction> Y) {
+		TIntArrayList freqSetsInX = getFrequentItemSetsIn(X);
 
 		// If no frequent item sets, can't do anything
 		if (freqSetsInX == null)
 			return;
 
-		// Generate any missing frequent item sets for Y
-		for (UserTransaction y : list) {
-			getFrequentItemSetsIn(y);
-		}
-
 		int hash;
 		SequenceTree sequence;
+		ItemSet freqSetX, freqSetY;
 		// for every freqSet in X, scan every Y for every freqSet
-		for (ItemSet freqSetX : freqSetsInX) {
+		for (int freqHashX : freqSetsInX.toArray()) {
+			freqSetX = frequentItemSets.get(freqHashX);
 
 			boolean encounteredSelf = false;
-			for (UserTransaction y : list) {
+			encountered.reset();
 
-				if (y.getFrequentItemSets() == null)
+			for (UserTransaction y : Y) {
+
+				// if y has no frequent sets, skip
+				if (getFrequentItemSetsIn(y) == null)
 					continue;
 
-				for (ItemSet freqSetY : y.getFrequentItemSets()) {
-					if (freqSetX.equals(freqSetY))
+				for (int freqHashY : getFrequentItemSetsIn(y).toArray()) {
+					freqSetY = frequentItemSets.get(freqHashY);
+
+					// if y has frequent item set x, move on to next freqSetX
+					// after this y iteration
+					if (freqSetX.hashCode() == freqSetY.hashCode())
 						encounteredSelf = true;
+
+					// Don't re-encounter a later sequence
+					if (encountered.contains(freqSetY.hashCode()))
+						continue;
 
 					hash = getHashCode(freqSetX, freqSetY);
 
@@ -55,6 +73,8 @@ public class BaseSequenceExtractor {
 
 					sequence.addIntraTime(y.getDaysSinceFirstOrder() - X.getDaysSinceFirstOrder());
 					sequence.addInterTime(X);
+
+					encountered.add(freqSetY.hashCode());
 				}
 
 				if (encounteredSelf)
@@ -64,31 +84,36 @@ public class BaseSequenceExtractor {
 
 	}
 
-	public void pruneMinSupport(int sup) {
-		TIntArrayList toRemove = new TIntArrayList();
-
-		for (SequenceTree s : baseSequences.values())
-			if (s.getSupport() < sup)
-				toRemove.add(s.hashCode());
+	public void pruneMinSupport(int min_support) {
+		for (int s : baseSequences.keys())
+			if (baseSequences.get(s).getIntertimes().size() == 0 || baseSequences.get(s).getSupport() < min_support)
+				toRemove.add(s);
 
 		for (int id : toRemove.toArray())
 			baseSequences.remove(id);
+
+		toRemove.resetQuick();
 	}
 
-	public Collection<SequenceTree> getSequences() {
-		return baseSequences.values();
+	public ArrayList<SequenceTree> getSequences() {
+		if (baseSequenceList.size() != baseSequences.size()) {
+			baseSequenceList.clear();
+			baseSequenceList.addAll(baseSequences.valueCollection());
+		}
+
+		return baseSequenceList;
 	}
 
 	public int size() {
 		return baseSequences.size();
 	}
 
-	private ArrayList<ItemSet> getFrequentItemSetsIn(UserTransaction t) {
+	private TIntArrayList getFrequentItemSetsIn(UserTransaction t) {
 		if (t.getFrequentItemSets() != null)
 			return t.getFrequentItemSets();
 
 		int i = 0;
-		for (ItemSet freqSet : frequentItemSets) {
+		for (ItemSet freqSet : frequentItemSetList) {
 			while (t.getItems().contains(freqSet.get(i))) {
 				i++;
 

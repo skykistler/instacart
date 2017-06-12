@@ -1,7 +1,5 @@
 package me.skykistler.dsm.assoc.tars;
 
-import java.util.ArrayList;
-
 import gnu.trove.list.array.TIntArrayList;
 import me.skykistler.dsm.assoc.fptree.ItemSet;
 
@@ -11,7 +9,7 @@ public class UserTransaction {
 	private TIntArrayList items;
 	private int daysSinceFirstOrder;
 
-	private ArrayList<ItemSet> frequentItemSets;
+	private TIntArrayList frequentItemSets;
 
 	public UserTransaction(int user_id, TIntArrayList items, int daysSinceFirstOrder) {
 		this.user_id = user_id;
@@ -31,15 +29,15 @@ public class UserTransaction {
 		return items;
 	}
 
-	public ArrayList<ItemSet> getFrequentItemSets() {
+	public TIntArrayList getFrequentItemSets() {
 		return frequentItemSets;
 	}
 
 	public void addFrequentItemSet(ItemSet freqSet) {
 		if (frequentItemSets == null)
-			frequentItemSets = new ArrayList<ItemSet>(2);
+			frequentItemSets = new TIntArrayList(2);
 
 		if (freqSet != null)
-			frequentItemSets.add(freqSet);
+			frequentItemSets.add(freqSet.hashCode());
 	}
 }

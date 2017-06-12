@@ -17,6 +17,7 @@ public class Phase1 {
 
 	public static final String BASKETS_FILE = "baskets min 1000.csv";
 	public static final String FREQUENT_ITEM_SETS_FILE = "frequent items.csv";
+	public static final int MIN_SUPPORT = 1000;
 
 	public CSVTable basketsTable;
 	public HashMap<Integer, ArrayList<UserTransaction>> basketLists = new HashMap<Integer, ArrayList<UserTransaction>>();
@@ -78,7 +79,7 @@ public class Phase1 {
 		for (int i = 0; i < basketsTable.size(); i++) {
 			// If we've hit the next user/order, add the current transaction and
 			// reset
-			if (cur_user != user_id.get(i) || cur_order != order_num.get(i)) {
+			if (cur_user != user_id.get(i) || cur_order < order_num.get(i)) {
 
 				if (currentTransaction != null) {
 					if (basketLists.get(cur_user) == null)
@@ -138,7 +139,7 @@ public class Phase1 {
 		System.out.println("Growing item sets...");
 		long before = System.nanoTime();
 
-		itemSets = root.r_growItemSets(null);
+		itemSets = root.r_growItemSets(null, MIN_SUPPORT);
 
 		long diff = System.nanoTime() - before;
 		diff /= 1000000000;
@@ -207,6 +208,14 @@ public class Phase1 {
 		NumberFormat formatter = NumberFormat.getInstance();
 		formatter.setMinimumFractionDigits(2);
 		System.out.println(formatter.format(usedMemory) + "GB of memory used");
+	}
+
+	public void wait(int seconds) {
+		try {
+			Thread.sleep(seconds * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {
