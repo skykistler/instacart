@@ -1,17 +1,23 @@
 package me.skykistler.dsm.table;
 
-public interface Table {
+import java.util.ArrayList;
 
-	public String[] getColumns();
+public interface Table {
 
 	public int size();
 
-	public String get(String column, int i);
+	public String[] getColumnNames();
 
 	public Column getColumn(String column);
 
+	public String get(String column, int i);
+
+	public void addColumn(Column column);
+
+	public void addRecord(ArrayList<Object> values);
+
 	public default void dirtyPrint(int rows) {
-		for (String h : getColumns()) {
+		for (String h : getColumnNames()) {
 			System.out.print(h + "   :   ");
 		}
 
@@ -21,7 +27,7 @@ public interface Table {
 			if (size() < i)
 				break;
 
-			for (String h : getColumns()) {
+			for (String h : getColumnNames()) {
 				System.out.print(get(h, i) + "   :   ");
 			}
 

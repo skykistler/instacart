@@ -20,11 +20,13 @@ public class IntColumn extends Column {
 	}
 
 	@Override
-	public void addRaw(String value) {
-		if (value.isEmpty())
+	public void addRaw(Object value) {
+		String raw = value.toString();
+
+		if (raw.isEmpty())
 			data.add(Integer.MIN_VALUE);
 		else
-			data.add(Integer.parseInt(value));
+			data.add(Integer.parseInt(raw));
 	}
 
 	@Override

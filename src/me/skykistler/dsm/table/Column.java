@@ -21,11 +21,11 @@ public abstract class Column {
 
 	public abstract String getRaw(int i);
 
-	public abstract void addRaw(String value);
+	public abstract void addRaw(Object value);
 
-	public void addRaw(ArrayList<String> raw) {
-		for (String s : raw) {
-			addRaw(s);
+	public void addRaw(ArrayList<Object> raw) {
+		for (Object value : raw) {
+			addRaw(value);
 		}
 	}
 

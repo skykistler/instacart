@@ -16,11 +16,13 @@ public class DecimalColumn extends Column {
 	}
 
 	@Override
-	public void addRaw(String value) {
-		if (value.isEmpty())
+	public void addRaw(Object value) {
+		String raw = value.toString();
+
+		if (raw.isEmpty())
 			data.add(Double.NaN);
 		else
-			data.add(Double.parseDouble(value));
+			data.add(Double.parseDouble(raw));
 	}
 
 	@Override

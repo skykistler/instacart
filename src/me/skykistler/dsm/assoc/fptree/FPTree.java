@@ -5,63 +5,94 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 
 public class FPTree {
 
-	private static FPTreeDictionary treeDict = new FPTreeDictionary();
+	protected static final int MIN_SUPPORT = 1000;
 
-	private FPTree parent;
-	private HashMap<Integer, FPTree> children = new HashMap<Integer, FPTree>();
+	// Unused right now, may be used for FP-Growth
+	// private static FPTreeDictionary treeDict = new FPTreeDictionary();
+	// private FPTree parent;
 
-	private int item_id;
-	private int support = 1;
+	protected HashMap<Integer, FPTree> children = new HashMap<Integer, FPTree>(2);
 
-	public FPTree(int item_id, FPTree parent) {
-		this.item_id = item_id;
-		this.parent = parent;
+	protected int item_id;
+	protected int support = 0;
+
+	/**
+	 * Instantiate a root FPTree
+	 */
+	public FPTree() {
+		this(-1);
 	}
 
-	public void r_insertTree(TIntList transaction_items) {
+	/**
+	 * Instantiate an FPTree branch with the specified node ID and parent link
+	 * 
+	 * @param item_id
+	 */
+	public FPTree(int item_id) {
+		this.item_id = item_id;
+		// this.parent = parent;
+	}
+
+	/**
+	 * Recursively insert items into the tree
+	 * 
+	 * @param transactionItems
+	 */
+	public void r_insertTree(TIntList transactionItems) {
 		FPTree nextPath;
 
-		if (hasChild(transaction_items.get(0))) {
-			nextPath = getChild(transaction_items.get(0));
-			nextPath.increment();
-
-		} else {
-			nextPath = new FPTree(transaction_items.get(0), this);
-
-			children.put(transaction_items.get(0), nextPath);
-			treeDict.add(nextPath);
+		// If node needs to be created
+		if (!hasChild(transactionItems.get(0))) {
+			nextPath = new FPTree(transactionItems.get(0));
+			children.put(transactionItems.get(0), nextPath);
+			// treeDict.add(nextPath);
+		}
+		// If node already exists
+		else {
+			nextPath = getChild(transactionItems.get(0));
 		}
 
-		if (transaction_items.size() > 1)
-			nextPath.r_insertTree(transaction_items.subList(1, transaction_items.size()));
+		nextPath.incrementSupport();
+
+		// If there are more items remaining, continue recursion
+		if (transactionItems.size() > 1)
+			nextPath.r_insertTree(transactionItems.subList(1, transactionItems.size()));
 	}
 
-	public ArrayList<TIntArrayList> r_growItemSets(TIntArrayList prefix) {
-		// recursively enumerate all paths with at least min_support
-		// add current prefix to resulting children prefixes
+	public ArrayList<ItemSet> r_growItemSets(ItemSet parentPrefix) {
+		// Prepare resulting sets
+		ArrayList<ItemSet> frequentItemSets = new ArrayList<ItemSet>();
 
-		TIntArrayList newPrefix = new TIntArrayList();
-		if (prefix != null)
-			newPrefix.addAll(prefix);
+		ItemSet thisPrefix = null;
+		if (!isRoot()) {
+			thisPrefix = new ItemSet();
 
-		if (getItemId() > 0)
-			newPrefix.add(getItemId());
+			// Carry over existing prefix
+			if (parentPrefix != null)
+				thisPrefix.addAll(parentPrefix);
 
-		ArrayList<TIntArrayList> itemSets = new ArrayList<TIntArrayList>();
-		itemSets.add(newPrefix);
+			// Add this node to the prefix
+			thisPrefix.add(getItemId());
+			thisPrefix.setSupport(support);
 
-		for (FPTree child : getChildren()) {
-			if (child.getSupport() < 10)
-				continue;
-
-			itemSets.addAll(child.r_growItemSets(newPrefix));
+			frequentItemSets.add(thisPrefix);
 		}
 
-		return itemSets;
+		for (FPTree child : getChildren()) {
+			if (child.getSupport() < MIN_SUPPORT)
+				continue;
+
+			frequentItemSets.addAll(child.r_growItemSets(thisPrefix));
+		}
+
+		return frequentItemSets;
+	}
+
+	public void incrementSupport() {
+		support++;
 	}
 
 	public boolean hasChild(int id) {
@@ -84,8 +115,8 @@ public class FPTree {
 		return support;
 	}
 
-	public void increment() {
-		support++;
+	public boolean isRoot() {
+		return item_id < 0;
 	}
 
 }

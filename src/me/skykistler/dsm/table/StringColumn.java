@@ -16,8 +16,8 @@ public class StringColumn extends Column {
 	}
 
 	@Override
-	public void addRaw(String value) {
-		data.add(value);
+	public void addRaw(Object value) {
+		data.add(value.toString());
 	}
 
 	@Override
