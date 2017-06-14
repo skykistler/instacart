@@ -1,6 +1,6 @@
 #'
 #'
-calculateMeanF1Score <- function() {
+calculateMeanF1Score <- function(orders = test.orders) {
   print('Calculating Mean F1-Score...', quote=F)
   
   orders_train <- db %>% 
@@ -10,12 +10,12 @@ calculateMeanF1Score <- function() {
            WHERE eval_set = 'train'
   ", rows_at_time=1024)
   
-  orders_train %<>% filter(order_id %in% non.train.orders[!order.validation.sample])
+  orders_train %<>% filter(order_id %in% orders$order_id)
   
   
   orders_train %<>%
     left_join(
-      test.orders %>%
+      orders %>%
         group_by(order_id) %>%
         filter(prediction == 1, reordered == 1) %>%
         summarise(
@@ -26,7 +26,7 @@ calculateMeanF1Score <- function() {
   
   orders_train %<>%
     left_join(
-      test.orders %>%
+      orders %>%
         group_by(order_id) %>%
         filter(prediction == 1) %>%
         summarise(
@@ -37,7 +37,7 @@ calculateMeanF1Score <- function() {
   
   orders_train %<>%
     left_join(
-      test.orders %>%
+      orders %>%
         group_by(order_id) %>%
         filter(reordered == 1) %>%
         summarise(
