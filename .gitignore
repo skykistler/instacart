@@ -1,6 +1,7 @@
 data/*
 .Rproj.user
 .RData
+.RDataTmp
 .Rhistory
 bin
 .settings
