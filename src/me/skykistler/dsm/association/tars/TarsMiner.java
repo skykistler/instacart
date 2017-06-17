@@ -1,4 +1,4 @@
-package me.skykistler.dsm.assoc.tars;
+package me.skykistler.dsm.association.tars;
 
 import java.util.ArrayList;
 

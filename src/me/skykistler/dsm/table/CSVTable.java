@@ -166,7 +166,7 @@ public class CSVTable implements Table {
 		for (Object value : raw) {
 			String s = value.toString();
 
-			if (s.isEmpty()) {
+			if (s.isEmpty() || NA_VALUE.equals(s)) {
 				continue;
 			}
 

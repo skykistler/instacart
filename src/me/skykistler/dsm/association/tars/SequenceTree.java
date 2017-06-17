@@ -1,8 +1,8 @@
-package me.skykistler.dsm.assoc.tars;
+package me.skykistler.dsm.association.tars;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
-import me.skykistler.dsm.assoc.fptree.ItemSet;
+import me.skykistler.dsm.association.fptree.ItemSet;
 
 public class SequenceTree implements Median {
 	public static TIntIntHashMap userTimes = new TIntIntHashMap();

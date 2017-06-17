@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 public interface Table {
 
+	public static final String NA_VALUE = "NULL";
+
 	public int size();
 
 	public ArrayList<String> getColumnNames();

@@ -1,11 +1,11 @@
-package me.skykistler.dsm.assoc.tars;
+package me.skykistler.dsm.association.tars;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import me.skykistler.dsm.assoc.fptree.ItemSet;
+import me.skykistler.dsm.association.fptree.ItemSet;
 
 public class BaseSequenceExtractor {
 

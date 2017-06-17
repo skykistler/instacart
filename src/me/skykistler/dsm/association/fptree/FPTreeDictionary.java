@@ -1,4 +1,4 @@
-package me.skykistler.dsm.assoc.fptree;
+package me.skykistler.dsm.association.fptree;
 
 import java.util.ArrayList;
 import java.util.HashMap;

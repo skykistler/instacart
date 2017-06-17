@@ -1,7 +1,7 @@
-package me.skykistler.dsm.assoc.tars;
+package me.skykistler.dsm.association.tars;
 
 import gnu.trove.list.array.TIntArrayList;
-import me.skykistler.dsm.assoc.fptree.ItemSet;
+import me.skykistler.dsm.association.fptree.ItemSet;
 
 public class UserTransaction {
 

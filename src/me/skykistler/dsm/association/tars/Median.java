@@ -1,4 +1,4 @@
-package me.skykistler.dsm.assoc.tars;
+package me.skykistler.dsm.association.tars;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;

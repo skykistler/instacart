@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import gnu.trove.list.array.TIntArrayList;
-import me.skykistler.dsm.assoc.fptree.ItemSet;
-import me.skykistler.dsm.assoc.tars.BaseSequenceExtractor;
-import me.skykistler.dsm.assoc.tars.SequenceTree;
-import me.skykistler.dsm.assoc.tars.TarsMiner;
-import me.skykistler.dsm.assoc.tars.UserTransaction;
+import me.skykistler.dsm.association.fptree.ItemSet;
+import me.skykistler.dsm.association.tars.BaseSequenceExtractor;
+import me.skykistler.dsm.association.tars.SequenceTree;
+import me.skykistler.dsm.association.tars.TarsMiner;
+import me.skykistler.dsm.association.tars.UserTransaction;
 import me.skykistler.dsm.table.CSVTable;
 import me.skykistler.dsm.table.DecimalColumn;
 import me.skykistler.dsm.table.IntColumn;

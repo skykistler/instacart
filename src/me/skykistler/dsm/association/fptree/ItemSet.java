@@ -1,4 +1,4 @@
-package me.skykistler.dsm.assoc.fptree;
+package me.skykistler.dsm.association.fptree;
 
 import gnu.trove.list.array.TIntArrayList;
 

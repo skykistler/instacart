@@ -6,9 +6,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import gnu.trove.list.array.TIntArrayList;
-import me.skykistler.dsm.assoc.fptree.FPTree;
-import me.skykistler.dsm.assoc.fptree.ItemSet;
-import me.skykistler.dsm.assoc.tars.UserTransaction;
+import me.skykistler.dsm.association.fptree.FPTree;
+import me.skykistler.dsm.association.fptree.ItemSet;
+import me.skykistler.dsm.association.tars.UserTransaction;
 import me.skykistler.dsm.table.CSVTable;
 import me.skykistler.dsm.table.IntColumn;
 import me.skykistler.dsm.table.StringColumn;
