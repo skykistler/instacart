@@ -26,7 +26,9 @@ public class TarsMiner implements Median {
 	// }
 
 	public void estimateParameters() {
-		setMaxIntertimes();
+		estimateMaxIntertimes();
+		estimateMinPeriodOccurences();
+		estimateMinPeriods();
 	}
 
 	public void sequenceFiltering() {
@@ -34,7 +36,7 @@ public class TarsMiner implements Median {
 		// assigned parameter values
 	}
 
-	public void setMaxIntertimes() {
+	public void estimateMaxIntertimes() {
 		TDoubleArrayList medianIntertimes = new TDoubleArrayList(sequences.size());
 		for (SequenceTree s : sequences)
 			medianIntertimes.add(s.getMedianInterTime());
@@ -70,6 +72,25 @@ public class TarsMiner implements Median {
 			bin_medianIntertimes.resetQuick();
 			cluster.clear();
 		}
+	}
+
+	public void getTemporallyCompliantPeriods() {
+		// Generate list of start/end times of periods based on max intertime
+		// If next sequence instance occurred after max_intertime, split period
+	}
+
+	public void estimateMinPeriodOccurences() {
+		getTemporallyCompliantPeriods();
+		// For each sequence, build list of occurrence count in each temporally
+		// compliant period
+		// Set each sequence's median period occurrence
+		// groupSimilar(median_period_occurence)
+		// Set each groups minimum period occurrence to the group's median
+		// period occurrence
+	}
+
+	public void estimateMinPeriods() {
+
 	}
 
 	public double binSize(TDoubleArrayList x) {
