@@ -17,7 +17,7 @@ import me.skykistler.dsm.table.StringColumn;
 public class Phase2 extends Phase1 {
 
 	public static final int MIN_SUPPORT_BASE_SEQUENCE = 50;
-	public static final String BASE_SEQUENCES_FILE = "base sequences.csv";
+	public static final String BASE_SEQUENCES_FILE = "processed/base sequences.csv";
 
 	public CSVTable frequentItemSetsTable;
 	public ArrayList<ItemSet> frequentItemSets;
@@ -80,7 +80,7 @@ public class Phase2 extends Phase1 {
 	}
 
 	public void extractBaseSequences() {
-		System.out.println("Loading base sequences...");
+		System.out.println("Extracting base sequences...");
 		long before = System.nanoTime();
 
 		sequenceExtractor = new BaseSequenceExtractor(frequentItemSets);

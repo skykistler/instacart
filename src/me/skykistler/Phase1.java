@@ -15,8 +15,8 @@ import me.skykistler.dsm.table.StringColumn;
 
 public class Phase1 {
 
-	public static final String BASKETS_FILE = "baskets min 1000.csv";
-	public static final String FREQUENT_ITEM_SETS_FILE = "frequent items.csv";
+	public static final String BASKETS_FILE = "facts/baskets min 1000.csv";
+	public static final String FREQUENT_ITEM_SETS_FILE = "processed/frequent items.csv";
 	public static final int MIN_SUPPORT = 1000;
 
 	public CSVTable basketsTable;
