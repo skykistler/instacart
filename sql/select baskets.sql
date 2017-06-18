@@ -1,5 +1,5 @@
 select
-  o.user_id, o.order_number, op.product_id, o.days_since_prior_order
+  u.department_cluster, o.user_id, o.order_number, op.product_id, o.days_since_prior_order
 
 from order_products op
 
@@ -14,6 +14,9 @@ join (
 join orders o
   on o.order_id = op.order_id
 
+join users u
+	on u.user_id = o.user_id
+
 where support >= 1000
 
-order by user_id, order_number, p.support desc;
+order by o.user_id, order_number desc, p.support desc;
