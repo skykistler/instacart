@@ -4,7 +4,7 @@ source('libraries.R')
 try ({
   odbcGetInfo(db)
 }, {
-  db <<- odbcDriverConnect('driver={SQL Server};server=SKY-PC\\SQLEXPRESS;database=instacart;trusted_connection=true')
+  db <<- odbcDriverConnect('driver={SQL Server};server=SKY-PC\\SQLEXPRESS;database=instacart;trusted_connection=true', rows_at_time = 1024)
 })
 
 #### Connect to h2o ####
