@@ -60,7 +60,7 @@ public class FPTree {
 			nextPath.r_insertTree(transactionItems.subList(1, transactionItems.size()));
 	}
 
-	public ArrayList<ItemSet> r_growItemSets(ItemSet parentPrefix, int min_support) {
+	public ArrayList<ItemSet> r_growItemSets(ItemSet parentPrefix, int min_support, int min_length, int max_length) {
 		// Prepare resulting sets
 		ArrayList<ItemSet> frequentItemSets = new ArrayList<ItemSet>();
 
@@ -76,14 +76,15 @@ public class FPTree {
 			thisPrefix.add(getItemId());
 			thisPrefix.setSupport(support);
 
-			frequentItemSets.add(thisPrefix);
+			if (thisPrefix.size() >= min_length && (max_length == 0 || thisPrefix.size() <= max_length))
+				frequentItemSets.add(thisPrefix);
 		}
 
 		for (FPTree child : getChildren()) {
 			if (child.getSupport() < min_support)
 				continue;
 
-			frequentItemSets.addAll(child.r_growItemSets(thisPrefix, min_support));
+			frequentItemSets.addAll(child.r_growItemSets(thisPrefix, min_support, min_length, max_length));
 		}
 
 		return frequentItemSets;

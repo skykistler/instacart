@@ -14,6 +14,6 @@ join (
 join orders o
   on o.order_id = op.order_id
 
-where support >= 2000
+where support >= 1000
 
 order by user_id, order_number, p.support desc;

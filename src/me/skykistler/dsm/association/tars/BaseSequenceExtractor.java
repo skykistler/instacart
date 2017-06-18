@@ -11,8 +11,8 @@ public class BaseSequenceExtractor {
 
 	private ArrayList<ItemSet> frequentItemSetList;
 	private TIntObjectHashMap<ItemSet> frequentItemSets = new TIntObjectHashMap<ItemSet>();
-	private TIntObjectHashMap<SequenceTree> baseSequences;
-	private ArrayList<SequenceTree> baseSequenceList;
+	private TIntObjectHashMap<TarSequence> baseSequences;
+	private ArrayList<TarSequence> baseSequenceList;
 
 	private TIntArrayList toRemove = new TIntArrayList();
 	private TIntArrayList encountered = new TIntArrayList();
@@ -23,8 +23,8 @@ public class BaseSequenceExtractor {
 		for (ItemSet set : frequentItemSetList)
 			frequentItemSets.put(set.hashCode(), set);
 
-		baseSequences = new TIntObjectHashMap<SequenceTree>(frequentItemSetList.size() * frequentItemSetList.size());
-		baseSequenceList = new ArrayList<SequenceTree>();
+		baseSequences = new TIntObjectHashMap<TarSequence>(frequentItemSetList.size() * frequentItemSetList.size());
+		baseSequenceList = new ArrayList<TarSequence>();
 	}
 
 	public void processUserTransactions(UserTransaction X, List<UserTransaction> Y) {
@@ -35,7 +35,7 @@ public class BaseSequenceExtractor {
 			return;
 
 		int hash;
-		SequenceTree sequence;
+		TarSequence sequence;
 		ItemSet freqSetX, freqSetY;
 		// for every freqSet in X, scan every Y for every freqSet
 		for (int freqHashX : freqSetsInX.toArray()) {
@@ -65,7 +65,7 @@ public class BaseSequenceExtractor {
 					hash = getHashCode(freqSetX, freqSetY);
 
 					if (!baseSequences.containsKey(hash)) {
-						sequence = new SequenceTree(freqSetX, freqSetY);
+						sequence = new TarSequence(freqSetX, freqSetY);
 						baseSequences.put(hash, sequence);
 					} else {
 						sequence = baseSequences.get(hash);
@@ -85,9 +85,18 @@ public class BaseSequenceExtractor {
 	}
 
 	public void pruneMinSupport(int min_support) {
-		for (int s : baseSequences.keys())
-			if (baseSequences.get(s).getIntertimes().size() == 0 || baseSequences.get(s).getSupport() < min_support)
+		for (int s : baseSequences.keys()) {
+			TarSequence seq = baseSequences.get(s);
+
+			if (seq.getIntertimes().size() == 0 || seq.getSupport() < min_support) {
 				toRemove.add(s);
+				continue;
+			}
+
+			// If all intertimes are Integer.MAX_VALUE, there are no periods :(
+			if (seq.getIntertimes().max() == Integer.MAX_VALUE && seq.getIntertimes().min() == Integer.MAX_VALUE)
+				toRemove.add(s);
+		}
 
 		for (int id : toRemove.toArray())
 			baseSequences.remove(id);
@@ -95,7 +104,7 @@ public class BaseSequenceExtractor {
 		toRemove.resetQuick();
 	}
 
-	public ArrayList<SequenceTree> getSequences() {
+	public ArrayList<TarSequence> getSequences() {
 		if (baseSequenceList.size() != baseSequences.size()) {
 			baseSequenceList.clear();
 			baseSequenceList.addAll(baseSequences.valueCollection());
