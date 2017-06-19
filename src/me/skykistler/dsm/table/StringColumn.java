@@ -10,6 +10,10 @@ public class StringColumn extends Column {
 		super(parent, title);
 	}
 
+	public String get(int i) {
+		return getRaw(i);
+	}
+
 	@Override
 	public String getRaw(int i) {
 		return data.get(i);

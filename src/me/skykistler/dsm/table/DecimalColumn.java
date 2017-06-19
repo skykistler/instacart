@@ -10,6 +10,10 @@ public class DecimalColumn extends Column {
 
 	private TDoubleArrayList data = new TDoubleArrayList();
 
+	public double get(int i) {
+		return data.get(i);
+	}
+
 	@Override
 	public String getRaw(int i) {
 		return data.get(i) + "";

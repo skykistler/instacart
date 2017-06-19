@@ -172,7 +172,6 @@ public class CSVTable implements Table {
 
 			if (s.indexOf('.') > -1) {
 				containsInts = 0;
-				continue;
 			}
 
 			if (containsInts != 0) {

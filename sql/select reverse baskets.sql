@@ -1,5 +1,5 @@
 select
-  o.user_id, o.order_number, op.product_id, o.days_since_prior_order
+  o.user_id, o.order_number, op.product_id, days_to_next_order = o2.days_since_prior_order
 
 from order_products op
 
@@ -14,9 +14,13 @@ join (
 join orders o
   on o.order_id = op.order_id
 
+left join orders o2
+  on o2.user_id = o.user_id
+  and o2.order_number = o.order_number + 1
+
 join users u
 	on u.user_id = o.user_id
 
 where support >= 1000
 
-order by o.user_id, order_number, p.support desc;
+order by o.user_id, order_number desc, p.support desc;

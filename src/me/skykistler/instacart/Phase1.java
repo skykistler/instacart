@@ -85,7 +85,7 @@ public class Phase1 {
 		for (int i = 0; i < basketsTable.size(); i++) {
 			// If we've hit the next user/order, add the current transaction and
 			// reset
-			if (cur_user != user_id.get(i) || cur_order < order_num.get(i)) {
+			if (user_id.get(i) != cur_user || order_num.get(i) != cur_order) {
 
 				// Add the previously current user's record
 				if (currentTransaction != null) {
