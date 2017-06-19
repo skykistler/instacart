@@ -17,7 +17,7 @@ loadReorders <- function() {
 #'
 #'@param sample.size Sets the total cut of reorder data to train/validate/test with
 #'@param train.split Sets the sub-cut of the sample data to use for training/validation
-splitReorders <- function(sample.size = .4, train.split = .4) {
+splitReorders <- function(sample.size = .6, train.split = .4) {
   print('Splitting orders...', quote=F)
   
   # Select samples by order ID to keep full orders together

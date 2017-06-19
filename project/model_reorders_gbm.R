@@ -11,13 +11,13 @@ buildReorderGbm <- function() {
     ,model_id = 'reordered.gbm'
     ,balance_classes = T
     ,nfolds=3
-    ,ntrees = 80
-    ,max_depth = 6
+    ,ntrees = 100
+    ,max_depth = 8
     ,min_rows = 2
     ,nbins = 32
     ,learn_rate = .2
     ,learn_rate_annealing = .995
-    ,score_tree_interval = 7
+    ,score_tree_interval = 9
     ,stopping_rounds = 3
     ,sample_rate = .95
     ,col_sample_rate = .95

@@ -6,13 +6,14 @@ source('project/test_meanf1score.R')
 source('project/test_reorders.R')
 source('project/insert_tars.R')
 
-# if (!exists('train.orders')) {
-#   loadReorders()
-#   splitReorders()
-# }
-# 
-# buildReorderGbm()
-# makeTrainPredictionsGbm()
-# 
-# 
-# makeTrainPredictionsGbm(orders = super.orders, orders.h2o = super.orders.h2o)
+if (!exists('train.orders')) {
+  loadReorders()
+  splitReorders()
+}
+
+buildReorderGbm()
+makeTrainPredictionsGbm()
+
+
+makeTrainPredictionsGbm(orders = super.orders, orders.h2o = super.orders.h2o)
+# makeTestPredictions()
