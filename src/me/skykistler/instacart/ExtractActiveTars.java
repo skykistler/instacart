@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import gnu.trove.list.array.TIntArrayList;
 import me.skykistler.dsm.association.tars.UserTransaction;
 import me.skykistler.dsm.table.CSVTable;
+import me.skykistler.dsm.table.Column;
 import me.skykistler.dsm.table.DecimalColumn;
 import me.skykistler.dsm.table.IntColumn;
 import me.skykistler.dsm.table.StringColumn;
@@ -141,6 +142,11 @@ public class ExtractActiveTars extends Phase1 {
 			return;
 		}
 
+		if (!(new File("data/" + TarSequencesByDpt.TAR_SEQUENCES_FOLDER + department_cluster + ".csv")).exists()) {
+			System.out.println("Skipping " + department_cluster + ", no TARS exist");
+			return;
+		}
+
 		try {
 
 			CSVTable tars = new CSVTable(TarSequencesByDpt.TAR_SEQUENCES_FOLDER + department_cluster + ".csv");
@@ -158,8 +164,8 @@ public class ExtractActiveTars extends Phase1 {
 			// IntColumn num_periods = (IntColumn)
 			// tars.getColumn("num_periods");
 
-			StringColumn X = (StringColumn) tars.getColumn("X");
-			StringColumn Y = (StringColumn) tars.getColumn("Y");
+			Column X = tars.getColumn("X");
+			Column Y = tars.getColumn("Y");
 
 			HashMap<String, Integer> period_occurrences = new HashMap<String, Integer>();
 
@@ -167,13 +173,18 @@ public class ExtractActiveTars extends Phase1 {
 				ArrayList<UserTransaction> baskets = basketLists.get(user_id);
 				period_occurrences.clear();
 
+				if (baskets == null) {
+					System.out.println("Failed to find baskets for user: " + user_id);
+					continue;
+				}
+
 				activeUserTars.put(user_id, new HashMap<Integer, ActiveTarRecord>());
 
 				for (int i = 0; i < tars.size(); i++) {
 
-					String key = X.get(i) + " - " + Y.get(i);
-					String[] xItems = X.get(i).split(" ");
-					String[] yItems = Y.get(i).split(" ");
+					String key = X.getRaw(i) + " - " + Y.getRaw(i);
+					String[] xItems = X.getRaw(i).split(" ");
+					String[] yItems = Y.getRaw(i).split(" ");
 
 					for (UserTransaction basket : baskets) {
 						// Skip baskets that are older than max_intertime

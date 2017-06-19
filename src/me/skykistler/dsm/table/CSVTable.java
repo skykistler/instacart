@@ -43,7 +43,7 @@ public class CSVTable implements Table {
 			}
 
 			// Load raw strings from the first 100 rows
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 1000; i++) {
 				boolean hadRow = csv.readRecord();
 
 				if (!hadRow)
