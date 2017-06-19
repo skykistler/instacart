@@ -122,8 +122,7 @@ public class ExtractActiveTars extends Phase1 {
 		System.out.println("Extracting active Y from baskets...");
 		long before = System.nanoTime();
 
-		IntStream.range(0, departmentClusterUsers.keySet().size()).parallel().forEach(
-				i -> processDepartmentCluster(i));
+		IntStream.range(0, departmentClusterUsers.keySet().size()).parallel().forEach(i -> processDepartmentCluster(i));
 
 		long diff = System.nanoTime() - before;
 		diff /= 1000000000;
@@ -144,8 +143,7 @@ public class ExtractActiveTars extends Phase1 {
 		HashMap<Integer, HashMap<Integer, ActiveTarRecord>> activeUserTars = new HashMap<Integer, HashMap<Integer, ActiveTarRecord>>();
 
 		DecimalColumn support = (DecimalColumn) tars.getColumn("support");
-		// DecimalColumn max_intertime = (DecimalColumn)
-		// tars.getColumn("max_intertime");
+		DecimalColumn max_intertime = (DecimalColumn) tars.getColumn("max_intertime");
 		DecimalColumn median_intratime = (DecimalColumn) tars.getColumn("median_intratime");
 		DecimalColumn median_period_occurrences = (DecimalColumn) tars.getColumn("median_period_occurences");
 		// IntColumn num_periods = (IntColumn)
@@ -164,36 +162,57 @@ public class ExtractActiveTars extends Phase1 {
 
 			for (int i = 0; i < tars.size(); i++) {
 
+				String key = X.get(i) + " - " + Y.get(i);
+				String[] xItems = X.get(i).split(" ");
+				String[] yItems = Y.get(i).split(" ");
+
 				for (UserTransaction basket : baskets) {
-					// Skip baskets that are older than median_intratime
-					if (basket.getDaysSinceFirstOrder() > median_intratime.get(i))
+					// Skip baskets that are older than max_intertime
+					if (basket.getDaysSinceFirstOrder() > max_intertime.get(i))
 						continue;
 
-					String[] xParts = X.get(i).split(" ");
-					boolean containsAll = true;
-					for (String x : xParts) {
+					boolean containsAllX = true;
+					for (String x : xItems) {
 						if (!basket.getItems().contains(Integer.parseInt(x))) {
-							containsAll = false;
+							containsAllX = false;
 							break;
 						}
 					}
 
 					// Basket must contain all X
-					if (!containsAll)
+					if (!containsAllX)
 						continue;
 
-					if (!period_occurrences.containsKey(X.get(i)))
-						period_occurrences.put(X.get(i), 0);
+					// Must be a later basket that contains all Y
+					for (UserTransaction basket_y : baskets) {
+						int intratime = basket_y.getDaysSinceFirstOrder() - basket.getDaysSinceFirstOrder();
+						if (basket == basket_y || intratime < 0 || intratime > median_intratime.get(i))
+							continue;
 
-					// Increment existing occurrences
-					int existing = period_occurrences.get(X.get(i));
-					period_occurrences.put(X.get(i), existing + 1);
+						boolean containsAllY = true;
+						for (String y : yItems) {
+							if (!basket_y.getItems().contains(Integer.parseInt(y))) {
+								containsAllY = false;
+								break;
+							}
+						}
+
+						if (!containsAllY)
+							continue;
+
+						if (!period_occurrences.containsKey(key))
+							period_occurrences.put(key, 0);
+
+						// Increment existing occurrences
+						int existing = period_occurrences.get(key);
+						period_occurrences.put(key, existing + 1);
+					}
 				}
 
-				if (!period_occurrences.containsKey(X.get(i)))
+				if (!period_occurrences.containsKey(key))
 					continue;
 
-				for (String yStr : Y.get(i).split(" ")) {
+				for (String yStr : yItems) {
 					int y = Integer.parseInt(yStr);
 
 					if (!activeUserTars.get(user_id).containsKey(y)) {
@@ -204,7 +223,7 @@ public class ExtractActiveTars extends Phase1 {
 					ActiveTarRecord activeTar = activeUserTars.get(user_id).get(y);
 					activeTar.support += support.get(i);
 
-					activeTar.occurrences_left += median_period_occurrences.get(i) - period_occurrences.get(X.get(i));
+					activeTar.occurrences_left += median_period_occurrences.get(i) - period_occurrences.get(key);
 				}
 
 			}
