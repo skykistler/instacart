@@ -1,5 +1,6 @@
 package me.skykistler.instacart;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.IntStream;
@@ -131,8 +132,14 @@ public class ExtractActiveTars extends Phase1 {
 	}
 
 	public void processDepartmentCluster(int department_cluster_index) {
+
 		// Get target department cluster
 		String department_cluster = departmentClusterUsers.keySet().toArray(new String[0])[department_cluster_index];
+
+		if ((new File("data/" + ACTIVE_TARS_FOLDER + department_cluster + ".csv")).exists()) {
+			System.out.println("Skipping " + department_cluster + ", file exists");
+			return;
+		}
 
 		CSVTable tars = new CSVTable(TarSequencesByDpt.TAR_SEQUENCES_FOLDER + department_cluster + ".csv");
 		System.out.println("Working on cluster: " + department_cluster + " with " + tars.size() + " potential TARS...");
