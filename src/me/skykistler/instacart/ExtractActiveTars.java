@@ -141,102 +141,109 @@ public class ExtractActiveTars extends Phase1 {
 			return;
 		}
 
-		CSVTable tars = new CSVTable(TarSequencesByDpt.TAR_SEQUENCES_FOLDER + department_cluster + ".csv");
-		System.out.println("Working on cluster: " + department_cluster + " with " + tars.size() + " potential TARS...");
+		try {
 
-		if (tars.size() < 1)
-			return;
+			CSVTable tars = new CSVTable(TarSequencesByDpt.TAR_SEQUENCES_FOLDER + department_cluster + ".csv");
+			System.out.println("Working on cluster: " + department_cluster + " with " + tars.size() + " potential TARS...");
 
-		HashMap<Integer, HashMap<Integer, ActiveTarRecord>> activeUserTars = new HashMap<Integer, HashMap<Integer, ActiveTarRecord>>();
+			if (tars.size() < 1)
+				return;
 
-		DecimalColumn support = (DecimalColumn) tars.getColumn("support");
-		DecimalColumn max_intertime = (DecimalColumn) tars.getColumn("max_intertime");
-		DecimalColumn median_intratime = (DecimalColumn) tars.getColumn("median_intratime");
-		DecimalColumn median_period_occurrences = (DecimalColumn) tars.getColumn("median_period_occurences");
-		// IntColumn num_periods = (IntColumn)
-		// tars.getColumn("num_periods");
+			HashMap<Integer, HashMap<Integer, ActiveTarRecord>> activeUserTars = new HashMap<Integer, HashMap<Integer, ActiveTarRecord>>();
 
-		StringColumn X = (StringColumn) tars.getColumn("X");
-		StringColumn Y = (StringColumn) tars.getColumn("Y");
+			DecimalColumn support = (DecimalColumn) tars.getColumn("support");
+			DecimalColumn max_intertime = (DecimalColumn) tars.getColumn("max_intertime");
+			DecimalColumn median_intratime = (DecimalColumn) tars.getColumn("median_intratime");
+			DecimalColumn median_period_occurrences = (DecimalColumn) tars.getColumn("median_period_occurences");
+			// IntColumn num_periods = (IntColumn)
+			// tars.getColumn("num_periods");
 
-		HashMap<String, Integer> period_occurrences = new HashMap<String, Integer>();
+			StringColumn X = (StringColumn) tars.getColumn("X");
+			StringColumn Y = (StringColumn) tars.getColumn("Y");
 
-		for (int user_id : departmentClusterUsers.get(department_cluster).toArray()) {
-			ArrayList<UserTransaction> baskets = basketLists.get(user_id);
-			period_occurrences.clear();
+			HashMap<String, Integer> period_occurrences = new HashMap<String, Integer>();
 
-			activeUserTars.put(user_id, new HashMap<Integer, ActiveTarRecord>());
+			for (int user_id : departmentClusterUsers.get(department_cluster).toArray()) {
+				ArrayList<UserTransaction> baskets = basketLists.get(user_id);
+				period_occurrences.clear();
 
-			for (int i = 0; i < tars.size(); i++) {
+				activeUserTars.put(user_id, new HashMap<Integer, ActiveTarRecord>());
 
-				String key = X.get(i) + " - " + Y.get(i);
-				String[] xItems = X.get(i).split(" ");
-				String[] yItems = Y.get(i).split(" ");
+				for (int i = 0; i < tars.size(); i++) {
 
-				for (UserTransaction basket : baskets) {
-					// Skip baskets that are older than max_intertime
-					if (basket.getDaysSinceFirstOrder() > max_intertime.get(i))
-						continue;
+					String key = X.get(i) + " - " + Y.get(i);
+					String[] xItems = X.get(i).split(" ");
+					String[] yItems = Y.get(i).split(" ");
 
-					boolean containsAllX = true;
-					for (String x : xItems) {
-						if (!basket.getItems().contains(Integer.parseInt(x))) {
-							containsAllX = false;
-							break;
-						}
-					}
-
-					// Basket must contain all X
-					if (!containsAllX)
-						continue;
-
-					// Must be a later basket that contains all Y
-					for (UserTransaction basket_y : baskets) {
-						int intratime = basket_y.getDaysSinceFirstOrder() - basket.getDaysSinceFirstOrder();
-						if (basket == basket_y || intratime < 0 || intratime > median_intratime.get(i))
+					for (UserTransaction basket : baskets) {
+						// Skip baskets that are older than max_intertime
+						if (basket.getDaysSinceFirstOrder() > max_intertime.get(i))
 							continue;
 
-						boolean containsAllY = true;
-						for (String y : yItems) {
-							if (!basket_y.getItems().contains(Integer.parseInt(y))) {
-								containsAllY = false;
+						boolean containsAllX = true;
+						for (String x : xItems) {
+							if (!basket.getItems().contains(Integer.parseInt(x))) {
+								containsAllX = false;
 								break;
 							}
 						}
 
-						if (!containsAllY)
+						// Basket must contain all X
+						if (!containsAllX)
 							continue;
 
-						if (!period_occurrences.containsKey(key))
-							period_occurrences.put(key, 0);
+						// Must be a later basket that contains all Y
+						for (UserTransaction basket_y : baskets) {
+							int intratime = basket_y.getDaysSinceFirstOrder() - basket.getDaysSinceFirstOrder();
+							if (basket == basket_y || intratime < 0 || intratime > median_intratime.get(i))
+								continue;
 
-						// Increment existing occurrences
-						int existing = period_occurrences.get(key);
-						period_occurrences.put(key, existing + 1);
+							boolean containsAllY = true;
+							for (String y : yItems) {
+								if (!basket_y.getItems().contains(Integer.parseInt(y))) {
+									containsAllY = false;
+									break;
+								}
+							}
+
+							if (!containsAllY)
+								continue;
+
+							if (!period_occurrences.containsKey(key))
+								period_occurrences.put(key, 0);
+
+							// Increment existing occurrences
+							int existing = period_occurrences.get(key);
+							period_occurrences.put(key, existing + 1);
+						}
 					}
-				}
 
-				if (!period_occurrences.containsKey(key))
-					continue;
+					if (!period_occurrences.containsKey(key))
+						continue;
 
-				for (String yStr : yItems) {
-					int y = Integer.parseInt(yStr);
+					for (String yStr : yItems) {
+						int y = Integer.parseInt(yStr);
 
-					if (!activeUserTars.get(user_id).containsKey(y)) {
-						activeUserTars.get(user_id).put(y, new ActiveTarRecord());
-						activeUserTars.get(user_id).get(y).item_y = y;
+						if (!activeUserTars.get(user_id).containsKey(y)) {
+							activeUserTars.get(user_id).put(y, new ActiveTarRecord());
+							activeUserTars.get(user_id).get(y).item_y = y;
+						}
+
+						ActiveTarRecord activeTar = activeUserTars.get(user_id).get(y);
+						activeTar.support += support.get(i);
+
+						activeTar.occurrences_left += median_period_occurrences.get(i) - period_occurrences.get(key);
 					}
 
-					ActiveTarRecord activeTar = activeUserTars.get(user_id).get(y);
-					activeTar.support += support.get(i);
-
-					activeTar.occurrences_left += median_period_occurrences.get(i) - period_occurrences.get(key);
 				}
-
 			}
-		}
 
-		saveActiveTars(department_cluster, activeUserTars);
+			saveActiveTars(department_cluster, activeUserTars);
+
+		} catch (Exception e) {
+			System.out.println(department_cluster + " failed.. skipping");
+			e.printStackTrace();
+		}
 	}
 
 	public void saveActiveTars(String cluster, HashMap<Integer, HashMap<Integer, ActiveTarRecord>> activeUserTars) {

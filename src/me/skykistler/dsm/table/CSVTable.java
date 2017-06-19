@@ -28,7 +28,7 @@ public class CSVTable implements Table {
 			load();
 	}
 
-	private void load() {
+	public void load() {
 		try {
 			CsvReader csv = new CsvReader(file.getAbsolutePath());
 
