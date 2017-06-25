@@ -13,16 +13,22 @@ import com.csvreader.CsvReader;
 public class CSVTable implements Table {
 
 	private File file;
+	private String naValue;
 
 	private ArrayList<String> columnNames = new ArrayList<String>();
 	private HashMap<String, Column> data = new HashMap<String, Column>();
 
 	public CSVTable(String name) {
-		this(name, false);
+		this(name, "NULL", false);
 	}
 
 	public CSVTable(String name, boolean overwrite) {
+		this(name, "NULL", overwrite);
+	}
+
+	public CSVTable(String name, String naValue, boolean overwrite) {
 		file = new File("data/" + name);
+		this.naValue = naValue;
 
 		if (!overwrite)
 			load();
@@ -150,6 +156,11 @@ public class CSVTable implements Table {
 		}
 	}
 
+	@Override
+	public String getNaValue() {
+		return naValue;
+	}
+
 	/**
 	 * Mini-factory method to get properly typed column
 	 * 
@@ -166,7 +177,7 @@ public class CSVTable implements Table {
 		for (Object value : raw) {
 			String s = value.toString();
 
-			if (s.isEmpty() || NA_VALUE.equals(s)) {
+			if (s.isEmpty() || naValue.equals(s)) {
 				continue;
 			}
 

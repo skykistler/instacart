@@ -13,7 +13,7 @@ import me.skykistler.dsm.table.DecimalColumn;
 import me.skykistler.dsm.table.IntColumn;
 import me.skykistler.dsm.table.StringColumn;
 
-public class ExtractActiveTars extends Phase1 {
+public class ExtractActiveDptTars extends Phase1 {
 
 	public static final String USERS_DPT_CLUSTER_FILE = "facts/users dpt clusters.csv";
 	public static final String ALL_BASKETS_REVERSE_ORDER = "facts/baskets reverse order min 1000.csv";
@@ -288,7 +288,7 @@ public class ExtractActiveTars extends Phase1 {
 	}
 
 	public static void main(String[] args) {
-		new ExtractActiveTars();
+		new ExtractActiveDptTars();
 	}
 
 	private class ActiveTarRecord {

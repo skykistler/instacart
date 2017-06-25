@@ -1,57 +1,80 @@
 package me.skykistler.dsm.association.tars;
 
 import gnu.trove.list.TDoubleList;
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.TIntList;
 
 public interface Median {
 
-	public default double median(TIntArrayList x) {
-		TIntArrayList sortedCopy = new TIntArrayList(x.size());
+	public default double median(TDoubleList xList) {
+		double[] x = xList.toArray();
 
-		// Remove 'breakpoints' constructed as MIN_VALUE or MAX_VALUE
-		for (int i : x.toArray())
-			if (i != Integer.MIN_VALUE && i != Integer.MAX_VALUE)
-				sortedCopy.add(i);
+		int k = (int) Math.floor((x.length - 1) / 2.0);
 
-		sortedCopy.sort();
+		int minIndex;
+		double minValue, swap_i;
+		for (int i = 0; i <= k; i++) {
+			minIndex = i;
+			minValue = x[i];
 
-		x = sortedCopy;
+			for (int j = i + 1; j < x.length; j++) {
 
-		int middle = x.size() / 2;
-		if (middle == 0 || x.size() % 2 == 1) {
-			return x.get(middle);
+				if (x[j] < minValue) {
+					minIndex = j;
+					minValue = x[j];
+
+					swap_i = x[i];
+					x[i] = x[minIndex];
+					x[minIndex] = swap_i;
+				}
+			}
+		}
+
+		return median_afterSort(xList);
+	}
+
+	public default double median(TIntList xList) {
+		int[] x = xList.toArray();
+
+		int k = (int) Math.floor((x.length - 1) / 2.0);
+
+		int minIndex, minValue, swap_i;
+		for (int i = 0; i <= k; i++) {
+			minIndex = i;
+			minValue = x[i];
+
+			for (int j = i + 1; j < x.length; j++) {
+
+				if (x[j] < minValue) {
+					minIndex = j;
+					minValue = x[j];
+
+					swap_i = x[i];
+					x[i] = x[minIndex];
+					x[minIndex] = swap_i;
+				}
+			}
+		}
+
+		return median_afterSort(xList);
+	}
+
+	public default double median_afterSort(TIntList x) {
+		int k = (int) Math.floor((x.size() - 1) / 2.0);
+
+		if (k == 0 || x.size() % 2 == 1) {
+			return x.get(k);
 		} else {
-			return (x.get(middle - 1) + x.get(middle)) / 2.0;
+			return (x.get(k - 1) + x.get(k)) / 2.0;
 		}
 	}
 
-	public default double median(TDoubleArrayList x) {
-		TDoubleArrayList sortedCopy = new TDoubleArrayList(x.size());
+	public default double median_afterSort(TDoubleList x) {
+		int k = (int) Math.floor((x.size() - 1) / 2.0);
 
-		// Remove 'breakpoints' constructed as NaN
-		for (double d : x.toArray())
-			if (!Double.isNaN(d))
-				sortedCopy.add(d);
-
-		sortedCopy.sort();
-
-		x = sortedCopy;
-
-		int middle = x.size() / 2;
-		if (middle == 0 || x.size() % 2 == 1) {
-			return x.get(middle);
+		if (k == 0 || x.size() % 2 == 1) {
+			return x.get(k);
 		} else {
-			return (x.get(middle - 1) + x.get(middle)) / 2.0;
-		}
-	}
-
-	public default double median_presorted(TDoubleList x) {
-		int middle = x.size() / 2;
-		if (middle == 0 || x.size() % 2 == 1) {
-			return x.get(middle);
-		} else {
-			return (x.get(middle - 1) + x.get(middle)) / 2.0;
+			return (x.get(k - 1) + x.get(k)) / 2.0;
 		}
 	}
 

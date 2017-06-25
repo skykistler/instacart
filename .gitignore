@@ -1,4 +1,5 @@
 data/facts/*
+data/processed/active_tars_user/*
 Data/submissions/*
 .Rproj.user
 .RData

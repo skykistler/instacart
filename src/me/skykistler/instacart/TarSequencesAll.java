@@ -181,7 +181,7 @@ public class TarSequencesAll extends Phase1 {
 		System.out.println("Estimating TARS parameters...");
 		long before = System.nanoTime();
 
-		tarsMiner = new TarsMiner(sequenceExtractor);
+		tarsMiner = new TarsMiner(sequenceExtractor.getSequences());
 		tarsMiner.estimateParameters();
 
 		long diff = System.nanoTime() - before;

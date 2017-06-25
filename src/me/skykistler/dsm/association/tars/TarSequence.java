@@ -12,9 +12,10 @@ public class TarSequence implements Median {
 	private int hash_id = -1;
 	private int support;
 
+	private int lastHeadTime = -1;
 	private TIntArrayList interTimes = new TIntArrayList(2); // distances
 																// between
-																// occurences
+																// head times
 	private TIntArrayList intraTimes = new TIntArrayList(2); // distances
 																// between head
 																// and tail
@@ -36,12 +37,17 @@ public class TarSequence implements Median {
 	}
 
 	public void addInterTime(UserTransaction t) {
-		if (userTimes.containsKey(hash_id))
-			interTimes.add(t.getDaysSinceFirstOrder() - userTimes.get(hash_id));
+		if (lastHeadTime == -1)
+			lastHeadTime = t.getDaysSinceFirstOrder();
 		else
-			interTimes.add(Integer.MAX_VALUE);
+			interTimes.add(t.getDaysSinceFirstOrder() - lastHeadTime);
 
-		userTimes.put(hash_id, t.getDaysSinceFirstOrder());
+		// if (userTimes.containsKey(hash_id))
+		// interTimes.add(t.getDaysSinceFirstOrder() - userTimes.get(hash_id));
+		// else
+		// interTimes.add(Integer.MAX_VALUE);
+		//
+		// userTimes.put(hash_id, t.getDaysSinceFirstOrder());
 	}
 
 	public TIntArrayList getIntertimes() {

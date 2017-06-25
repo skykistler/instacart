@@ -23,7 +23,7 @@ public class IntColumn extends Column {
 	public void addRaw(Object value) {
 		String raw = value.toString();
 
-		if (raw.isEmpty() || Table.NA_VALUE.equals(raw))
+		if (raw.isEmpty() || parent.getNaValue().equals(raw))
 			data.add(Integer.MIN_VALUE);
 		else
 			data.add(Integer.parseInt(raw));

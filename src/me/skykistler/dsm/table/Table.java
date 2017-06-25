@@ -5,8 +5,6 @@ import java.util.HashMap;
 
 public interface Table {
 
-	public static final String NA_VALUE = "NULL";
-
 	public int size();
 
 	public ArrayList<String> getColumnNames();
@@ -18,6 +16,8 @@ public interface Table {
 	public void addColumn(Column column);
 
 	public void addRecord(ArrayList<Object> values);
+
+	public String getNaValue();
 
 	public default void dirtyPrint(int rows) {
 		for (String h : getColumnNames()) {

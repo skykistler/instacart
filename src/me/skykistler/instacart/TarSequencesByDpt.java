@@ -122,7 +122,7 @@ public class TarSequencesByDpt extends Phase1 {
 		System.out.println("Estimating TARS parameters...");
 		long before = System.nanoTime();
 
-		tarsMiner = new TarsMiner(sequenceExtractor);
+		tarsMiner = new TarsMiner(sequenceExtractor.getSequences());
 		tarsMiner.estimateParameters();
 
 		tarsMiner.filterSequences();

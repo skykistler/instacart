@@ -23,7 +23,7 @@ public class DecimalColumn extends Column {
 	public void addRaw(Object value) {
 		String raw = value.toString();
 
-		if (raw.isEmpty() || Table.NA_VALUE.equals(raw))
+		if (raw.isEmpty() || parent.getNaValue().equals(raw))
 			data.add(Double.NaN);
 		else
 			data.add(Double.parseDouble(raw));

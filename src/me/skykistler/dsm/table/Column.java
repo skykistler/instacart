@@ -3,8 +3,8 @@ package me.skykistler.dsm.table;
 import java.util.ArrayList;
 
 public abstract class Column {
-	private String title;
-	private Table parent;
+	protected String title;
+	protected Table parent;
 
 	public Column(Table parent, String title) {
 		this.parent = parent;

@@ -7,24 +7,15 @@ import gnu.trove.list.array.TIntArrayList;
 
 public class TarsMiner implements Median {
 
-	private ArrayList<TarSequence> sequences;
+	private ArrayList<TarSequence> baseSequences;
 
-	public TarsMiner(BaseSequenceExtractor sequenceExtractor) {
-		sequences = sequenceExtractor.getSequences();
+	public TarsMiner(ArrayList<TarSequence> baseSequences) {
+		this.baseSequences = baseSequences;
 	}
 
-	// public void extractTars(baskets) {
-	// ArrayList<Tars> sequences = extractBaseSequences(baskets);
-	//
-	// params = parametersEstimation(sequences, baskets);
-	// sequences = sequenceFiltering(baskets, sequences, params);
-	//
-	// tarsTree = buildTarsTree(baskets, sequences, params);
-	//
-	// tars = extractTarsFromTree(tree);
-	//
-	// return tars;
-	// }
+	public ArrayList<TarSequence> getSequences() {
+		return baseSequences;
+	}
 
 	public void estimateParameters() {
 		estimateMaxIntertimes();
@@ -35,19 +26,29 @@ public class TarsMiner implements Median {
 	public void filterSequences() {
 		ArrayList<TarSequence> toRemove = new ArrayList<TarSequence>();
 
-		for (TarSequence seq : sequences) {
+		for (TarSequence seq : baseSequences) {
 			if (!seq.hasSatisfyingIntratime())
 				toRemove.add(seq);
 			else if (!seq.hasSatisfyingIntertime())
 				toRemove.add(seq);
 		}
 
-		sequences.removeAll(toRemove);
+		baseSequences.removeAll(toRemove);
 	}
 
-	public void estimateMaxIntertimes() {
-		TDoubleArrayList medianIntertimes = new TDoubleArrayList(sequences.size());
-		for (TarSequence s : sequences)
+	private void estimateMaxIntertimes() {
+		// goal is find optimal distance between occurrences that differentiates
+		// start of next period
+		// use the median intertime of sequences with similar typical intertimes
+
+		// so this finds a middle ground between a user's periods of consumption
+		// vs. a user's specific sequence period of consumption
+
+		// this approach attempts to optimize the trade-off between signal of
+		// a specific sequence's recurrence vs. noise or missing recurrences
+
+		TDoubleArrayList medianIntertimes = new TDoubleArrayList(baseSequences.size());
+		for (TarSequence s : baseSequences)
 			medianIntertimes.add(s.getMedianInterTime());
 
 		double binSize = binSize(medianIntertimes);
@@ -55,7 +56,7 @@ public class TarsMiner implements Median {
 		double bins = Math.ceil((medianIntertimes.max() - min) / binSize);
 
 		if (bins == 0 || binSize == 0) {
-			for (TarSequence s : sequences)
+			for (TarSequence s : baseSequences)
 				s.setMaxInterTime(s.getMedianInterTime());
 			return;
 		}
@@ -63,14 +64,14 @@ public class TarsMiner implements Median {
 		System.out.println("Intertime bin size: " + binSize);
 		System.out.println("Intertime bins: " + bins);
 
-		TDoubleArrayList bin_medianIntertimes = new TDoubleArrayList((int) (sequences.size() / bins));
-		ArrayList<TarSequence> cluster = new ArrayList<TarSequence>((int) (sequences.size() / bins));
+		TDoubleArrayList bin_medianIntertimes = new TDoubleArrayList((int) (baseSequences.size() / bins));
+		ArrayList<TarSequence> cluster = new ArrayList<TarSequence>((int) (baseSequences.size() / bins));
 
 		for (int b = 0; b < bins; b++) {
 			double bin_min = min + b * binSize;
 			double bin_max = bin_min + binSize;
 
-			for (TarSequence s : sequences)
+			for (TarSequence s : baseSequences)
 				if (s.getMedianInterTime() >= bin_min && s.getMedianInterTime() < bin_max) {
 					bin_medianIntertimes.add(s.getMedianInterTime());
 					cluster.add(s);
@@ -90,12 +91,16 @@ public class TarsMiner implements Median {
 		}
 	}
 
-	public void getTemporallyCompliantPeriods() {
+	private void getTemporallyCompliantPeriods() {
 		// Generate list of start/end times of periods based on max intertime
 		// If next sequence instance occurred after max_intertime, split period
 	}
 
-	public void estimateMinPeriodOccurences() {
+	private void estimateMinPeriodOccurences() {
+		// goal is to filter out periods with low occurrence count
+		// compared to sequences with similar number of occurrences per
+		// intra-time period
+
 		// For each sequence, build list of occurrences in each period
 
 		TIntArrayList periodOccurences = new TIntArrayList();
@@ -103,7 +108,7 @@ public class TarsMiner implements Median {
 
 		int cur_period_occurrences, i;
 		double median;
-		for (TarSequence seq : sequences) {
+		for (TarSequence seq : baseSequences) {
 			cur_period_occurrences = 1;
 
 			for (i = 0; i < seq.getIntertimes().size(); i++) {
@@ -144,15 +149,15 @@ public class TarsMiner implements Median {
 		// System.out.println("Q bins: " + bins);
 		//
 		// TDoubleArrayList bin_medianPeriodOccurences = new
-		// TDoubleArrayList((int) (sequences.size() / bins));
+		// TDoubleArrayList((int) (baseSequences.size() / bins));
 		// ArrayList<TarSequence> cluster = new ArrayList<TarSequence>((int)
-		// (sequences.size() / bins));
+		// (baseSequences.size() / bins));
 		//
 		// for (int b = 0; b < bins; b++) {
 		// double bin_min = min + b * binSize;
 		// double bin_max = bin_min + binSize;
 		//
-		// for (TarSequence s : sequences)
+		// for (TarSequence s : baseSequences)
 		// if (s.getMedianPeriodOccurences() >= bin_min &&
 		// s.getMedianPeriodOccurences() < bin_max) {
 		// bin_medianPeriodOccurences.add(s.getMedianPeriodOccurences());
@@ -174,11 +179,12 @@ public class TarsMiner implements Median {
 		// }
 	}
 
-	public void estimateMinPeriods() {
-
+	private void estimateMinPeriods() {
+		// goal is to filter sequences that have relatively few recurrences
+		// compared to sequences with similar occurrences:periods ratio
 	}
 
-	public double binSize(TDoubleArrayList x) {
+	private double binSize(TDoubleArrayList x) {
 		x.sort();
 
 		int n = (int) Math.floor(x.size() / 2.0);
@@ -186,60 +192,11 @@ public class TarsMiner implements Median {
 		if (n == 0)
 			return x.get(0);
 
-		double q1 = median_presorted(x.subList(0, n));
-		double q3 = median_presorted(x.subList(n, x.size()));
+		double q1 = median_afterSort(x.subList(0, n));
+		double q3 = median_afterSort(x.subList(n, x.size()));
 		double icr = q3 - q1;
 
 		return Math.min(1 + Math.log(x.size()) / Math.log(2), Math.floor(2 * icr / Math.cbrt(x.size())));
 	}
-
-	public ArrayList<TarSequence> getSequences() {
-		return sequences;
-	}
-
-	// public void getActiveTars(baskets, t, T) {
-	// That = new ArrayList<Tars>();
-	// Yam = L.clone();
-	//
-	// baskets.sortDescending();
-	//
-	// for (int j = 0; j < baskets.size(); j++) {
-	// int i = j - 1;
-	// int aprev = Tj - Ti;
-	//
-	// for (X in basket[i]) {
-	// for (Y in basket[j]) {
-	//
-	// y = X -> Y;
-	// if (Yam.contains(y) || a1 <= aprev <= a2) {
-	//
-	// if (That.contains(y)) {
-	// y.Q <- Qy + 1;
-	// y.L <- Ti;
-	//
-	// if (y.Q > q) {
-	// That.remove(y); // failing
-	// Yam.remove(y);
-	// }
-	//
-	//
-	// if (y.L - Ti > q . (a1 - a2)) {
-	// Yam.remove(y); // passing
-	// }
-	// } else {
-	// That.push(y);
-	// y.Q = 1;
-	// y.L = Ti;
-	// }
-	//
-	// }
-	//
-	// if (Yam.empty()) return That;
-	// }
-	// }
-	// }
-	//
-	// return That;
-	// }
 
 }
